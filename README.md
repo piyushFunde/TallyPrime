@@ -4,7 +4,7 @@ SmartERP is a modern, web-based Enterprise Resource Planning (ERP) platform desi
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 ### Frontend:
 * **Next.js 16** (App Router & Turbopack)
@@ -24,7 +24,7 @@ SmartERP is a modern, web-based Enterprise Resource Planning (ERP) platform desi
 
 ---
 
-## 🔑 Core Features
+##  Core Features
 
 1. **Keyboard-Only Navigation**: Fully supports standard TallyPrime shortcuts:
    * `F1` = Select Company
@@ -52,19 +52,13 @@ SmartERP is a modern, web-based Enterprise Resource Planning (ERP) platform desi
 
 ---
 
-## 🚀 How to Run the Project Locally
+##  How to Run the Project Locally
 
 ### 1. Start the Backend (Port 8080)
 To run the backend instantly without setting up PostgreSQL, you can use the built-in H2 fallback profile:
 
 ```bash
 cd backend
-
-# On Windows PowerShell:
-$env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
-& "C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2024.3.5\plugins\maven\lib\maven3\bin\mvn.cmd" spring-boot:run "-Dspring-boot.run.profiles=h2"
-
-# Or if maven is installed globally:
 mvn spring-boot:run -Dspring-boot.run.profiles=h2
 ```
 
@@ -76,9 +70,3 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
----
-
-## 👤 Seeded Login Credentials
-To test the features immediately, use the pre-seeded admin account:
-* **Email**: `admin@smarterp.com`
-* **Password**: `admin123`
