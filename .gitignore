@@ -38,3 +38,6 @@ backend/src/main/resources/application.properties
 # H2 database files
 *.mv.db
 *.trace.db
+
+# Task lists
+task.md
