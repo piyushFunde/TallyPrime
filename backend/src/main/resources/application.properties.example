@@ -1,0 +1,26 @@
+# ========================
+# SmartERP Production Configuration Template
+# Copy this file to application.properties and update credentials
+# ========================
+
+spring.application.name=SmartERP
+
+# PostgreSQL Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/smarterp
+spring.datasource.username=your_postgres_username
+spring.datasource.password=your_postgres_password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA / Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# Server
+server.port=8080
+
+# Swagger / OpenAPI
+springdoc.api-docs.path=/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
+springdoc.swagger-ui.enabled=true

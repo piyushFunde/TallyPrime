@@ -1,0 +1,350 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* TallyPrime Custom Colors */
+  --color-tally-dark: var(--tally-dark);
+  --color-tally-sidebar: var(--tally-sidebar);
+  --color-tally-sidebar-hover: var(--tally-sidebar-hover);
+  --color-tally-header: var(--tally-header);
+  --color-tally-content: var(--tally-content);
+  --color-tally-highlight: var(--tally-highlight);
+  --color-tally-text: var(--tally-text);
+  --color-tally-text-muted: var(--tally-text-muted);
+  --color-tally-border: var(--tally-border);
+  --color-tally-accent: var(--tally-accent);
+  --color-tally-gold: var(--tally-gold);
+  --color-tally-status: var(--tally-status);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+
+  /* TallyPrime Theme Colors */
+  --tally-dark: #1a2332;
+  --tally-sidebar: #1e3a4f;
+  --tally-sidebar-hover: #26506b;
+  --tally-header: #0d4f6b;
+  --tally-content: #f5f0e8;
+  --tally-highlight: #ffb347;
+  --tally-text: #e8e0d4;
+  --tally-text-muted: #8fa4b5;
+  --tally-border: #2a5470;
+  --tally-accent: #00a8cc;
+  --tally-gold: #d4a843;
+  --tally-status: #162636;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* ================================
+   TallyPrime Inspired Custom Styles
+   ================================ */
+
+/* Keyboard shortcut badges */
+.shortcut-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #ffb347;
+  background: rgba(255, 179, 71, 0.12);
+  border: 1px solid rgba(255, 179, 71, 0.3);
+  border-radius: 3px;
+  font-family: var(--font-geist-mono), monospace;
+}
+
+/* Tally-style selected row */
+.tally-row-selected {
+  background: linear-gradient(90deg, #0d4f6b 0%, #1e3a4f 100%) !important;
+  color: #ffb347;
+}
+
+/* Animated focus glow */
+.tally-focus-glow:focus-within {
+  box-shadow: 0 0 0 2px rgba(0, 168, 204, 0.4), 0 0 12px rgba(0, 168, 204, 0.15);
+  transition: box-shadow 0.2s ease;
+}
+
+/* Tally field input style */
+.tally-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e8e0d4;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+}
+.tally-input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #00a8cc;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 168, 204, 0.25);
+}
+
+/* Status bar style */
+.tally-status-bar {
+  background: linear-gradient(180deg, #1a2a3a 0%, #0f1a26 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Smooth page transitions */
+.tally-fade-in {
+  animation: tallyFadeIn 0.25s ease-out;
+}
+@keyframes tallyFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide in from right */
+.tally-slide-in {
+  animation: tallySlideIn 0.2s ease-out;
+}
+@keyframes tallySlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Pulsing cursor effect */
+.tally-cursor-pulse {
+  animation: cursorPulse 1.2s ease-in-out infinite;
+}
+@keyframes cursorPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Custom scrollbar for the tally theme */
+.tally-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.tally-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15);
+}
+.tally-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+.tally-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* =======================================
+   TallyPrime Right Shortcut Panel Styles
+   ======================================= */
+
+.tally-right-panel {
+  background-color: #ebf3fa;
+  border-left: 1px solid #b8c9d9;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.tally-right-panel-header {
+  background-color: #102d2c;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.tally-right-panel-button {
+  background-color: #f4f9fd;
+  border: 1px solid #cce2f5;
+  color: #1e3a4f;
+  font-size: 11px;
+  transition: all 0.1s ease;
+  height: 28px;
+}
+
+.tally-right-panel-button:hover:not(:disabled) {
+  background-color: #e2f0fc;
+  border-color: #9ac8ed;
+}
+
+.tally-right-panel-button:disabled {
+  background-color: #ebf3fa;
+  border-color: #dbe7f2;
+  color: #a3b8cc;
+  cursor: default;
+}
+
+.tally-right-panel-button-key {
+  color: #2b506e;
+  font-weight: 700;
+  border-right: 1px solid #dbe7f2;
+  width: 32px;
+}
+
+.tally-right-panel-button:disabled .tally-right-panel-button-key {
+  color: #a3b8cc;
+}
+
+.tally-right-panel-button-label {
+  padding-left: 6px;
+}
+
+.tally-right-panel-collapse-bar {
+  background-color: #c9d8e6;
+  border-right: 1px solid #b0c2d4;
+  color: #2b506e;
+}
+
+.tally-right-panel-collapse-bar:hover {
+  background-color: #b8c9d9;
+}
+
+.tally-right-panel-button-active-flash {
+  animation: keyFlash 0.15s ease-out;
+}
+
+@keyframes keyFlash {
+  0% {
+    background-color: #ffb347;
+    color: #1a2332;
+    border-color: #ffb347;
+  }
+  100% {
+    background-color: #f4f9fd;
+    color: #1e3a4f;
+    border-color: #cce2f5;
+  }
+}
