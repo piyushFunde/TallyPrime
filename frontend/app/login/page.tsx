@@ -79,7 +79,7 @@ export default function LoginPage() {
               onKeyDown={handleEmailKeyDown}
               required
               disabled={isLoading}
-              placeholder="e.g. administrator@domain.com"
+              placeholder=""
               className="w-full bg-white border border-[#1e3a4f]/30 p-2 text-xs font-bold text-tally-dark focus:outline-none focus:border-tally-accent"
             />
           </div>
@@ -98,7 +98,7 @@ export default function LoginPage() {
               onKeyDown={handlePasswordKeyDown}
               required
               disabled={isLoading}
-              placeholder="••••••••"
+              placeholder=""
               className="w-full bg-white border border-[#1e3a4f]/30 p-2 text-xs font-bold text-tally-dark focus:outline-none focus:border-tally-accent"
             />
             {/* Show Password Option */}

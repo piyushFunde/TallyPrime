@@ -127,7 +127,7 @@ export default function RegisterPage() {
               onKeyDown={handleNameKeyDown}
               required
               disabled={submitting}
-              placeholder="e.g. John Doe"
+              placeholder=""
               className="w-full bg-white border border-[#1e3a4f]/30 p-2 text-xs font-bold text-tally-dark focus:outline-none focus:border-tally-accent"
             />
           </div>
@@ -146,7 +146,7 @@ export default function RegisterPage() {
               onKeyDown={handleEmailKeyDown}
               required
               disabled={submitting}
-              placeholder="e.g. operator@domain.com"
+              placeholder=""
               className="w-full bg-white border border-[#1e3a4f]/30 p-2 text-xs font-bold text-tally-dark focus:outline-none focus:border-tally-accent"
             />
           </div>
@@ -165,7 +165,7 @@ export default function RegisterPage() {
               onKeyDown={handlePasswordKeyDown}
               required
               disabled={submitting}
-              placeholder="••••••••"
+              placeholder=""
               className="w-full bg-white border border-[#1e3a4f]/30 p-2 text-xs font-bold text-tally-dark focus:outline-none focus:border-tally-accent"
             />
           </div>
@@ -184,7 +184,7 @@ export default function RegisterPage() {
               onKeyDown={handleConfirmPasswordKeyDown}
               required
               disabled={submitting}
-              placeholder="••••••••"
+              placeholder=""
               className="w-full bg-white border border-[#1e3a4f]/30 p-2 text-xs font-bold text-tally-dark focus:outline-none focus:border-tally-accent"
             />
             {/* Show Passwords Option */}
