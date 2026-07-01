@@ -559,14 +559,14 @@ export default function RightShortcutPanel() {
   if (isCollapsed) {
     return (
       <div 
-        className="w-6 flex flex-col justify-between items-center py-2 bg-[#dbe7f2] border-l border-[#b8c9d9] select-none cursor-pointer"
+        className="w-6 flex flex-col justify-between items-center py-2 bg-[#112130] border-l border-[#1b2b3a] select-none cursor-pointer text-[#8ca3b8] hover:text-white"
         onClick={() => setIsCollapsed(false)}
         title="Expand shortcuts bar"
       >
-        <button className="text-[#2b506e] hover:text-[#1a2332] focus:outline-none mb-4">
+        <button className="text-[#8ca3b8] hover:text-white focus:outline-none mb-4">
           <ChevronLeft size={14} />
         </button>
-        <div className="flex-1 flex flex-col justify-center items-center font-bold text-[9px] text-[#2b506e]/70 tracking-widest uppercase [writing-mode:vertical-lr]">
+        <div className="flex-1 flex flex-col justify-center items-center font-bold text-[9px] text-[#8ca3b8]/70 tracking-widest uppercase [writing-mode:vertical-lr]">
           S h o r t c u t s
         </div>
       </div>
@@ -575,75 +575,120 @@ export default function RightShortcutPanel() {
 
   return (
     <>
-      <aside className="w-[160px] flex flex-col tally-right-panel select-none shrink-0">
-        {/* Help Header Block */}
+      <aside className="w-[180px] flex flex-col bg-[#112130] border-l border-[#1b2b3a] select-none shrink-0 font-mono text-[#8fa4b5] h-full">
+        {/* Help/Select Company Header Block */}
         {helpItem && (
-          <button
-            type="button"
+          <div
             onClick={helpItem.action}
-            className={`tally-right-panel-header w-full text-left py-2 px-3 flex items-center justify-between border-b border-white/10 ${
-              flashKey === "F1" ? "bg-tally-highlight text-tally-dark" : ""
-            }`}
+            className={`w-full py-2.5 px-3 flex items-center justify-between border-b border-[#1b2b3a] bg-[#0c1926] cursor-pointer hover:bg-[#1a2d40] text-white transition-colors`}
           >
-            <span>F1: Select Comp</span>
-            <HelpCircle size={12} className="opacity-70" />
-          </button>
+            <span className="text-[10px] font-bold tracking-wider">F1 • SELECT COMP</span>
+            <button 
+              type="button" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsCollapsed(true);
+              }}
+              className="text-[#8fa4b5] hover:text-white transition-colors p-0.5"
+              title="Collapse Panel"
+            >
+              <X size={12} />
+            </button>
+          </div>
         )}
 
-        <div className="flex-1 flex">
-          {/* Collapse Bar Strip */}
-          <div 
-            onClick={() => setIsCollapsed(true)}
-            className="w-[20px] flex flex-col items-center pt-2 tally-right-panel-collapse-bar cursor-pointer transition-colors"
-            title="Collapse shortcuts bar"
-          >
-            <X size={12} />
-          </div>
+        {/* Shortcuts keys list container */}
+        <div className="flex-1 p-2 flex flex-col justify-between gap-1 overflow-y-auto tally-scrollbar">
+          
+          {/* Main buttons block */}
+          <div className="flex flex-col gap-1">
+            {/* Upper keys F2 to F9 */}
+            {mainButtons.slice(0, 8).map((item) => {
+              const isFlashing = flashKey === item.key;
+              const isModalTrigger = ["F2", "F3", "F4"].includes(item.key);
 
-          {/* Shortcut Keys Stack */}
-          <div className="flex-1 p-1 flex flex-col justify-between gap-1 overflow-y-auto tally-scrollbar">
-            <div className="flex flex-col gap-0.5">
-              {mainButtons.map((item) => {
-                const isFlashing = flashKey === item.key;
+              if (isModalTrigger) {
                 return (
                   <button
                     key={item.key}
                     type="button"
-                    disabled={!item.isActive}
                     onClick={item.action}
-                    className={`tally-right-panel-button w-full rounded flex items-center text-left p-0 overflow-hidden ${
-                      isFlashing ? "tally-right-panel-button-active-flash" : ""
+                    className={`w-full rounded flex items-center text-left py-1 px-1 transition-colors cursor-pointer select-none ${
+                      isFlashing ? "bg-[#e68a00] text-white" : "bg-transparent hover:bg-[#1c2d3d] text-[#8fa4b5]"
                     }`}
                   >
-                    <span className="tally-right-panel-button-key h-full flex items-center justify-center text-[10px] shrink-0">
+                    <span className="w-10 h-[22px] flex items-center justify-center bg-[#203345] rounded-sm text-[10px] font-bold text-[#8fa4b5] shrink-0 border border-[#1b4359]/20">
                       {renderKeyBadge(item.key)}
                     </span>
-                    <span className="tally-right-panel-button-label truncate pr-1">
+                    <span className="pl-2.5 text-xs font-semibold truncate pr-1">
                       {item.label}
                     </span>
                   </button>
                 );
-              })}
-            </div>
+              } else {
+                return (
+                  <div
+                    key={item.key}
+                    className={`w-full rounded flex items-center text-left py-1 px-1 bg-transparent text-[#8fa4b5]/60 opacity-60 select-none ${
+                      isFlashing ? "bg-[#e68a00]/30 text-white" : ""
+                    }`}
+                  >
+                    <span className="w-10 h-[22px] flex items-center justify-center bg-[#203345] rounded-sm text-[10px] font-bold text-[#8fa4b5] shrink-0 border border-[#1b4359]/20">
+                      {renderKeyBadge(item.key)}
+                    </span>
+                    <span className="pl-2.5 text-xs font-semibold truncate pr-1">
+                      {item.label}
+                    </span>
+                  </div>
+                );
+              }
+            })}
 
-            {/* Configure F12 at bottom */}
+            {/* First Divider */}
+            <hr className="border-t border-[#1b2b3a]/30 my-1.5" />
+
+            {/* Lower keys Alt+L, Alt+S, F10, F11 */}
+            {mainButtons.slice(8).map((item) => {
+              const isFlashing = flashKey === item.key;
+              return (
+                <div
+                  key={item.key}
+                  className={`w-full rounded flex items-center text-left py-1 px-1 bg-transparent text-[#8fa4b5]/60 opacity-60 select-none ${
+                    isFlashing ? "bg-[#e68a00]/30 text-white" : ""
+                  }`}
+                >
+                  <span className="w-10 h-[22px] flex items-center justify-center bg-[#203345] rounded-sm text-[10px] font-bold text-[#8fa4b5] shrink-0 border border-[#1b4359]/20">
+                    {renderKeyBadge(item.key)}
+                  </span>
+                  <span className="pl-2.5 text-xs font-semibold truncate pr-1">
+                    {item.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Bottom block with second divider and F12 Configure */}
+          <div className="mt-auto">
+            <hr className="border-t border-[#1b2b3a]/30 mb-2" />
             {configItem && (
               <button
                 type="button"
                 onClick={configItem.action}
-                className={`tally-right-panel-button w-full rounded flex items-center text-left p-0 overflow-hidden border-t-2 ${
-                  flashKey === "F12" ? "tally-right-panel-button-active-flash" : ""
+                className={`w-full rounded flex items-center text-left py-1 px-1 transition-colors cursor-pointer select-none ${
+                  flashKey === "F12" ? "bg-[#e68a00] text-white" : "bg-transparent hover:bg-[#1c2d3d] text-[#8fa4b5]"
                 }`}
               >
-                <span className="tally-right-panel-button-key h-full flex items-center justify-center text-[10px] shrink-0">
+                <span className="w-10 h-[22px] flex items-center justify-center bg-[#203345] rounded-sm text-[10px] font-bold text-[#8fa4b5] shrink-0 border border-[#1b4359]/20">
                   F12
                 </span>
-                <span className="tally-right-panel-button-label truncate pr-1 font-semibold">
+                <span className="pl-2.5 text-xs font-semibold truncate pr-1">
                   {configItem.label}
                 </span>
               </button>
             )}
           </div>
+
         </div>
       </aside>
 

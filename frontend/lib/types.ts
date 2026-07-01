@@ -2,7 +2,7 @@
 // SmartERP TypeScript Interfaces
 // ================================
 
-export type LedgerType = "CUSTOMER" | "SUPPLIER";
+export type LedgerType = "CUSTOMER" | "SUPPLIER" | "EXPENSE" | "INCOME" | "BANK" | "CASH";
 export type VoucherType = "SALES" | "PURCHASE" | "PAYMENT" | "RECEIPT" | "JOURNAL" | "CONTRA" | "CREDIT_NOTE" | "DEBIT_NOTE";
 
 export interface Ledger {

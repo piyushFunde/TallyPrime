@@ -190,30 +190,28 @@ export default function SalesVoucherPage() {
   // ==========================================
   if (viewMode === "list") {
     return (
-      <div className="min-h-full bg-gradient-to-br from-tally-dark via-[#1a2d40] to-tally-dark tally-fade-in">
+      <div className="min-h-full bg-[#f3ede2] text-[#112130] tally-fade-in font-mono">
         {/* Header */}
-        <div className="border-b border-tally-border/50 bg-tally-header/30 px-6 py-4">
+        <div className="border-b border-[#1b2b3a]/15 bg-white/30 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <ShoppingCart size={20} className="text-purple-400" />
+              <div className="p-2 rounded bg-purple-500/10 text-purple-600">
+                <ShoppingCart size={20} />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-tally-text">
+                <h1 className="text-lg font-black text-[#112130] leading-none font-sans">
                   Sales Vouchers
                 </h1>
-                <p className="text-xs text-tally-text-muted">
+                <p className="text-xs text-gray-500 mt-1.5 font-sans">
                   Customer bills & invoices
                 </p>
               </div>
             </div>
             <button
               onClick={() => setViewMode("create")}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-purple-500/20 text-purple-400 text-xs font-medium hover:bg-purple-500/30 transition-colors"
+              className="px-4 py-1.5 rounded bg-[#e68a00] hover:bg-[#cc7a00] text-white text-xs font-bold cursor-pointer transition-all shadow-md"
             >
-              <Plus size={13} />
-              New Sales
-              <span className="shortcut-key ml-1">F8</span>
+              + New Sales <span className="text-[10px] opacity-80 font-normal ml-0.5">F8</span>
             </button>
           </div>
         </div>
@@ -221,85 +219,64 @@ export default function SalesVoucherPage() {
         {/* Voucher List */}
         <div className="px-6 py-4">
           {loading ? (
-            <div className="text-center py-12 text-tally-text-muted text-sm">
-              Loading...
+            <div className="text-center py-12 text-gray-500 text-xs">
+              Loading vouchers...
             </div>
           ) : vouchers.length === 0 ? (
-            <div className="text-center py-16">
-              <FileText
-                size={40}
-                className="mx-auto text-tally-text-muted/30 mb-3"
-              />
-              <p className="text-sm text-tally-text-muted mb-1">
+            <div className="text-center py-16 bg-white border border-[#1b2b3a]/15 rounded-md p-6">
+              <FileText size={40} className="mx-auto text-gray-400/45 mb-3" />
+              <p className="text-sm text-gray-500 font-bold mb-1">
                 No sales vouchers yet
               </p>
-              <p className="text-xs text-tally-text-muted/50">
-                Press <span className="shortcut-key">F8</span> to create a new
-                sales voucher
+              <p className="text-xs text-gray-400">
+                Press <span className="shortcut-key font-bold text-[#e68a00] bg-[#e68a00]/10 px-1 py-0.5 rounded font-mono">F8</span> to create a new sales voucher.
               </p>
             </div>
           ) : (
-            <div className="rounded-lg border border-tally-border/30 overflow-hidden">
+            <div className="overflow-x-auto rounded-md border border-[#1b2b3a]/15 shadow-sm bg-white">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="bg-tally-header/40 border-b border-tally-border/30">
-                    <th className="text-left px-4 py-2.5 text-tally-text-muted font-semibold">
-                      Voucher No.
-                    </th>
-                    <th className="text-left px-4 py-2.5 text-tally-text-muted font-semibold">
-                      Date
-                    </th>
-                    <th className="text-left px-4 py-2.5 text-tally-text-muted font-semibold">
-                      Customer
-                    </th>
-                    <th className="text-right px-4 py-2.5 text-tally-text-muted font-semibold">
-                      Subtotal
-                    </th>
-                    <th className="text-right px-4 py-2.5 text-tally-text-muted font-semibold">
-                      GST
-                    </th>
-                    <th className="text-right px-4 py-2.5 text-tally-text-muted font-semibold">
-                      Total
-                    </th>
-                    <th className="text-center px-4 py-2.5 text-tally-text-muted font-semibold">
-                      Actions
-                    </th>
+                  <tr className="bg-[#112130]/5 border-b border-[#1b2b3a]/15">
+                    <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Voucher No.</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Date</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Customer</th>
+                    <th className="text-right px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Subtotal</th>
+                    <th className="text-right px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">GST</th>
+                    <th className="text-right px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Total</th>
+                    <th className="text-center px-4 py-3 text-gray-500 font-bold uppercase tracking-wider w-24">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {vouchers.map((v, i) => (
                     <tr
                       key={v.id}
-                      className={`border-b border-tally-border/20 hover:bg-tally-sidebar-hover/50 transition-colors cursor-pointer ${
-                        i % 2 === 0 ? "bg-tally-dark/20" : ""
+                      className={`border-b border-[#1b2b3a]/10 hover:bg-[#112130]/5 transition-colors cursor-pointer ${
+                        i % 2 === 0 ? "bg-white" : "bg-gray-50/30"
                       }`}
                       onClick={() => setDetailVoucher(v)}
                     >
-                      <td className="px-4 py-2.5 text-tally-accent font-mono font-medium">
+                      <td className="px-4 py-2.5 text-[#135066] font-mono font-bold">
                         {v.voucherNumber}
                       </td>
-                      <td className="px-4 py-2.5 text-tally-text-muted">
+                      <td className="px-4 py-2.5 text-gray-500 font-medium">
                         {v.voucherDate}
                       </td>
-                      <td className="px-4 py-2.5 text-tally-text font-medium">
+                      <td className="px-4 py-2.5 text-gray-800 font-bold">
                         {v.ledgerName}
                       </td>
-                      <td className="px-4 py-2.5 text-right text-tally-text-muted">
+                      <td className="px-4 py-2.5 text-right text-gray-500 font-medium">
                         {formatCurrency(v.subtotal)}
                       </td>
-                      <td className="px-4 py-2.5 text-right text-tally-text-muted">
+                      <td className="px-4 py-2.5 text-right text-gray-500 font-medium">
                         {formatCurrency(v.gstAmount)}
                       </td>
-                      <td className="px-4 py-2.5 text-right font-bold text-tally-text">
+                      <td className="px-4 py-2.5 text-right font-black text-gray-800 text-[13px]">
                         {formatCurrency(v.totalAmount)}
                       </td>
-                      <td className="px-4 py-2.5 text-center">
+                      <td className="px-4 py-2.5 text-center" onClick={(e) => e.stopPropagation()}>
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDetailVoucher(v);
-                          }}
-                          className="p-1.5 rounded hover:bg-tally-accent/20 text-tally-text-muted hover:text-tally-accent transition-colors"
+                          onClick={() => setDetailVoucher(v)}
+                          className="p-1 rounded hover:bg-blue-100 text-gray-400 hover:text-blue-600 transition-colors"
                         >
                           <Eye size={13} />
                         </button>

@@ -25,13 +25,13 @@ const masterLinks: SidebarLink[] = [
   {
     label: "Ledgers",
     href: "/ledgers",
-    icon: <BookOpen size={16} />,
+    icon: <BookOpen size={15} />,
     shortcut: "Alt+L",
   },
   {
     label: "Stock Items",
     href: "/stock-items",
-    icon: <Package size={16} />,
+    icon: <Package size={15} />,
     shortcut: "Alt+S",
   },
 ];
@@ -40,13 +40,13 @@ const voucherLinks: SidebarLink[] = [
   {
     label: "Sales Voucher",
     href: "/vouchers/sales",
-    icon: <ShoppingCart size={16} />,
+    icon: <ShoppingCart size={15} />,
     shortcut: "F8",
   },
   {
     label: "Purchase Voucher",
     href: "/vouchers/purchase",
-    icon: <Truck size={16} />,
+    icon: <Truck size={15} />,
     shortcut: "F9",
   },
 ];
@@ -58,43 +58,29 @@ export default function Sidebar() {
   const isActive = (href: string) => pathname === href;
 
   return (
-    <aside className="w-[220px] min-h-screen flex flex-col bg-tally-sidebar border-r border-tally-border select-none">
-      {/* Logo / Brand */}
-      <div className="px-4 py-4 border-b border-tally-border">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-md bg-gradient-to-br from-tally-accent to-tally-highlight flex items-center justify-center text-white font-bold text-sm shadow-lg group-hover:scale-105 transition-transform">
-            S
-          </div>
-          <div>
-            <h1 className="text-sm font-bold text-tally-text tracking-wide">
-              SmartERP
-            </h1>
-            <p className="text-[10px] text-tally-text-muted leading-none">
-              Billing & Accounting
-            </p>
-          </div>
-        </Link>
-      </div>
+    <aside className="w-[200px] min-h-full flex flex-col bg-[#112130] border-r border-[#1b2b3a] select-none font-mono">
+      {/* Top spacing block - replacement for Logo Header */}
+      <div className="h-4" />
 
-      {/* Dashboard Link */}
-      <div className="px-2 pt-3">
+      {/* Gateway Dashboard Link */}
+      <div className="px-2">
         <Link
           href="/"
-          className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium transition-all duration-150 ${
+          className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-bold transition-all duration-150 ${
             isActive("/")
-              ? "bg-tally-sidebar-hover text-tally-highlight"
-              : "text-tally-text-muted hover:bg-tally-sidebar-hover hover:text-tally-text"
+              ? "bg-[#1c2d3d] text-[#ffb347] border border-[#ffb347]/20"
+              : "text-[#8ca3b8] hover:bg-[#1c2d3d] hover:text-white"
           }`}
         >
-          <LayoutDashboard size={15} />
-          <span>Gateway of SmartERP</span>
-          <span className="shortcut-key ml-auto">Ctrl+H</span>
+          <LayoutDashboard size={14} />
+          <span>Gateway</span>
+          <span className="shortcut-key ml-auto">^H</span>
         </Link>
       </div>
 
       {/* Masters Section */}
       <div className="px-2 pt-4">
-        <p className="px-3 text-[10px] font-semibold uppercase tracking-widest text-tally-text-muted/60 mb-1.5">
+        <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-[#8ca3b8]/50 mb-1.5">
           Masters
         </p>
         <nav className="space-y-0.5">
@@ -102,19 +88,15 @@ export default function Sidebar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium transition-all duration-150 group ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 group ${
                 isActive(link.href)
-                  ? "bg-tally-sidebar-hover text-tally-highlight"
-                  : "text-tally-text-muted hover:bg-tally-sidebar-hover hover:text-tally-text"
+                  ? "bg-[#1c2d3d] text-[#ffb347] border border-[#ffb347]/20"
+                  : "text-[#8ca3b8] hover:bg-[#1c2d3d] hover:text-white"
               }`}
             >
               {link.icon}
               <span>{link.label}</span>
-              <span className="shortcut-key ml-auto">{link.shortcut}</span>
-              <ChevronRight
-                size={12}
-                className="opacity-0 group-hover:opacity-100 transition-opacity text-tally-text-muted"
-              />
+              <span className="shortcut-key ml-auto text-[9px] scale-90">{link.shortcut}</span>
             </Link>
           ))}
         </nav>
@@ -122,7 +104,7 @@ export default function Sidebar() {
 
       {/* Vouchers Section */}
       <div className="px-2 pt-4">
-        <p className="px-3 text-[10px] font-semibold uppercase tracking-widest text-tally-text-muted/60 mb-1.5">
+        <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-[#8ca3b8]/50 mb-1.5">
           Vouchers
         </p>
         <nav className="space-y-0.5">
@@ -130,19 +112,15 @@ export default function Sidebar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-medium transition-all duration-150 group ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 group ${
                 isActive(link.href)
-                  ? "bg-tally-sidebar-hover text-tally-highlight"
-                  : "text-tally-text-muted hover:bg-tally-sidebar-hover hover:text-tally-text"
+                  ? "bg-[#1c2d3d] text-[#ffb347] border border-[#ffb347]/20"
+                  : "text-[#8ca3b8] hover:bg-[#1c2d3d] hover:text-white"
               }`}
             >
               {link.icon}
               <span>{link.label}</span>
-              <span className="shortcut-key ml-auto">{link.shortcut}</span>
-              <ChevronRight
-                size={12}
-                className="opacity-0 group-hover:opacity-100 transition-opacity text-tally-text-muted"
-              />
+              <span className="shortcut-key ml-auto text-[9px] scale-90">{link.shortcut}</span>
             </Link>
           ))}
         </nav>
@@ -153,15 +131,15 @@ export default function Sidebar() {
 
       {/* User Info & Logout Button */}
       {user && (
-        <div className="px-3 py-2 mx-2 mb-2 rounded bg-tally-dark/20 border border-tally-border/20 flex items-center justify-between gap-1.5 text-tally-text-muted select-none">
+        <div className="px-3 py-2 mx-2 mb-2 rounded bg-[#0c1926]/40 border border-[#1b2b3a]/50 flex items-center justify-between gap-1 text-[#8ca3b8] select-none">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold text-tally-highlight truncate leading-tight">{user.name}</p>
-            <p className="text-[8px] text-tally-text-muted/60 truncate leading-none mt-0.5">{user.email}</p>
+            <p className="text-[10px] font-bold text-[#ffb347] truncate leading-tight">Piyush</p>
+            <p className="text-[8px] text-[#8ca3b8]/60 truncate leading-none mt-1">piyushfunde4455@gmail.com</p>
           </div>
           <button
             type="button"
             onClick={logout}
-            className="p-1.5 rounded hover:bg-tally-sidebar-hover text-red-400 hover:text-red-300 transition-all shrink-0 cursor-pointer"
+            className="p-1 rounded hover:bg-[#1c2d3d] text-red-400 hover:text-red-300 transition-all shrink-0 cursor-pointer"
             title="Log Out"
           >
             <LogOut size={13} />
@@ -170,9 +148,9 @@ export default function Sidebar() {
       )}
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-tally-border">
-        <p className="text-[10px] text-tally-text-muted/50 text-center">
-          SmartERP v1.0 — MVP
+      <div className="px-4 py-2 border-t border-[#1b2b3a] bg-[#0c1926]/50">
+        <p className="text-[8px] text-[#8ca3b8]/40 text-center font-mono tracking-tight leading-tight">
+          SmartERP v1.0 — MVP build
         </p>
       </div>
     </aside>

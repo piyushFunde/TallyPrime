@@ -151,171 +151,135 @@ export default function StockItemsPage() {
   };
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-tally-dark via-[#1a2d40] to-tally-dark tally-fade-in">
+    <div className="min-h-full bg-[#f3ede2] text-[#112130] tally-fade-in font-mono">
       {/* Page Header */}
-      <div className="border-b border-tally-border/50 bg-tally-header/30 px-6 py-4">
+      <div className="border-b border-[#1b2b3a]/15 bg-white/30 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-green-500/10">
-              <Package size={20} className="text-green-400" />
+            <div className="p-2 rounded bg-emerald-500/10 text-emerald-600">
+              <Package size={20} />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-tally-text">
+              <h1 className="text-lg font-black text-[#112130] leading-none font-sans">
                 Stock Item Management
               </h1>
-              <p className="text-xs text-tally-text-muted">
+              <p className="text-xs text-gray-500 mt-1.5 font-sans">
                 Manage your inventory & products
               </p>
             </div>
           </div>
           <button
             onClick={openCreateDialog}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-500/20 text-green-400 text-xs font-medium hover:bg-green-500/30 transition-colors"
+            className="px-4 py-1.5 rounded bg-[#e68a00] hover:bg-[#cc7a00] text-white text-xs font-bold cursor-pointer transition-all shadow-md"
           >
-            <Plus size={13} />
-            New Item
-            <span className="shortcut-key ml-1">Alt+S</span>
+            + New Item <span className="text-[10px] opacity-80 font-normal ml-0.5">Alt+S</span>
           </button>
         </div>
       </div>
 
-      {/* Search */}
-      <div className="px-6 py-3 border-b border-tally-border/30 flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
+      {/* Search and Filters */}
+      <div className="px-6 py-3 border-b border-[#1b2b3a]/10 bg-white/10 flex items-center gap-3">
+        <div className="relative flex-1 max-w-md">
           <Search
             size={14}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-tally-text-muted/50"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
           />
           <input
             type="text"
             placeholder="Search stock items..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="tally-input w-full rounded-md text-xs"
+            className="w-full bg-white border border-[#1b2b3a]/25 rounded-md px-3 py-1.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#e68a00]"
             style={{ paddingLeft: "2.25rem" }}
           />
         </div>
-        <div className="text-xs text-tally-text-muted ml-auto">
+        <div className="text-[11px] text-gray-500 font-bold ml-auto">
           {items.length} item(s)
         </div>
       </div>
 
-      {/* Table */}
+      {/* Content Area */}
       <div className="px-6 py-4">
         {loading ? (
-          <div className="text-center py-12 text-tally-text-muted text-sm">
-            Loading...
+          <div className="text-center py-12 text-gray-500 text-xs">
+            Loading stock items...
           </div>
         ) : items.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="text-center py-20 bg-white border border-[#1b2b3a]/15 rounded-md p-8 shadow-sm max-w-5xl mx-auto">
             <Package
-              size={40}
-              className="mx-auto text-tally-text-muted/30 mb-3"
+              size={48}
+              className="mx-auto text-gray-400/40 mb-4"
+              strokeWidth={1}
             />
-            <p className="text-sm text-tally-text-muted mb-1">
-              No stock items found
-            </p>
-            <p className="text-xs text-tally-text-muted/50">
-              Press <span className="shortcut-key">Alt+S</span> to create a new
-              item
+            <h3 className="text-base font-bold text-gray-700 mb-1">
+              No stock items yet
+            </h3>
+            <p className="text-xs text-gray-400 font-sans">
+              This is where inventory will live. Press <span className="shortcut-key font-bold text-[#e68a00] bg-[#e68a00]/10 px-1 py-0.5 rounded font-mono">Alt+S</span> to add your first item.
             </p>
           </div>
         ) : (
-          <div className="rounded-lg border border-tally-border/30 overflow-hidden">
+          <div className="overflow-x-auto rounded-md border border-[#1b2b3a]/15 shadow-sm bg-white">
             <table className="w-full text-xs">
               <thead>
-                <tr className="bg-tally-header/40 border-b border-tally-border/30">
-                  <th className="text-left px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Item Name
-                  </th>
-                  <th className="text-left px-4 py-2.5 text-tally-text-muted font-semibold">
-                    SKU
-                  </th>
-                  <th className="text-left px-4 py-2.5 text-tally-text-muted font-semibold">
-                    HSN Code
-                  </th>
-                  <th className="text-center px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Unit
-                  </th>
-                  <th className="text-right px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Purchase ₹
-                  </th>
-                  <th className="text-right px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Selling ₹
-                  </th>
-                  <th className="text-center px-4 py-2.5 text-tally-text-muted font-semibold">
-                    GST %
-                  </th>
-                  <th className="text-right px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Stock
-                  </th>
-                  <th className="text-center px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Actions
-                  </th>
+                <tr className="bg-[#112130]/5 border-b border-[#1b2b3a]/15">
+                  <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Item Name</th>
+                  <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">SKU</th>
+                  <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">HSN Code</th>
+                  <th className="text-center px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Unit</th>
+                  <th className="text-right px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Purchase Price</th>
+                  <th className="text-right px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Selling Price</th>
+                  <th className="text-center px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">GST %</th>
+                  <th className="text-right px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Stock</th>
+                  <th className="text-center px-4 py-3 text-gray-500 font-bold uppercase tracking-wider w-24">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, i) => (
                   <tr
                     key={item.id}
-                    className={`border-b border-tally-border/20 hover:bg-tally-sidebar-hover/50 transition-colors ${
-                      i % 2 === 0 ? "bg-tally-dark/20" : ""
+                    className={`border-b border-[#1b2b3a]/10 hover:bg-[#112130]/5 transition-colors cursor-pointer ${
+                      i % 2 === 0 ? "bg-white" : "bg-gray-50/30"
                     }`}
                   >
-                    <td className="px-4 py-2.5 text-tally-text font-medium">
-                      {item.name}
-                    </td>
-                    <td className="px-4 py-2.5 text-tally-text-muted font-mono text-[10px]">
-                      {item.sku || "—"}
-                    </td>
-                    <td className="px-4 py-2.5 text-tally-text-muted">
-                      {item.hsnCode || "—"}
-                    </td>
+                    <td className="px-4 py-2.5 text-gray-800 font-bold text-[13px]">{item.name}</td>
+                    <td className="px-4 py-2.5 text-gray-500 font-mono text-[10px] uppercase">{item.sku || "—"}</td>
+                    <td className="px-4 py-2.5 text-gray-500 font-sans text-[11px]">{item.hsnCode || "—"}</td>
                     <td className="px-4 py-2.5 text-center">
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] border-tally-border/40 text-tally-text-muted"
-                      >
+                      <Badge variant="outline" className="text-[10px] border-emerald-500/20 text-emerald-600 bg-emerald-500/5 px-2 py-0.5 rounded">
                         {item.unit}
                       </Badge>
                     </td>
-                    <td className="px-4 py-2.5 text-right text-tally-text-muted">
+                    <td className="px-4 py-2.5 text-right text-gray-600 font-medium">
                       {formatCurrency(item.purchasePrice)}
                     </td>
-                    <td className="px-4 py-2.5 text-right text-tally-text">
+                    <td className="px-4 py-2.5 text-right text-gray-800 font-bold">
                       {formatCurrency(item.sellingPrice)}
                     </td>
-                    <td className="px-4 py-2.5 text-center text-tally-text-muted">
-                      {item.gstRate}%
-                    </td>
-                    <td className="px-4 py-2.5 text-right font-medium">
-                      <span
-                        className={`flex items-center justify-end gap-1 ${
-                          item.currentStock <= 0
-                            ? "text-red-400"
-                            : item.currentStock < 10
-                            ? "text-yellow-400"
-                            : "text-green-400"
-                        }`}
-                      >
-                        {item.currentStock <= 0 && (
-                          <AlertTriangle size={12} />
-                        )}
+                    <td className="px-4 py-2.5 text-center text-gray-500 font-semibold">{item.gstRate}%</td>
+                    <td className="px-4 py-2.5 text-right">
+                      <span className={`font-black text-[13px] ${
+                        item.currentStock <= 0
+                          ? "text-red-500"
+                          : item.currentStock < 10
+                          ? "text-[#e68a00]"
+                          : "text-emerald-600"
+                      }`}>
                         {item.currentStock}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5">
+                    <td className="px-4 py-2.5" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-center gap-1">
                         <button
                           onClick={() => openEditDialog(item)}
-                          className="p-1.5 rounded hover:bg-tally-accent/20 text-tally-text-muted hover:text-tally-accent transition-colors"
+                          className="p-1 rounded hover:bg-blue-100 text-gray-400 hover:text-blue-600 transition-colors"
                           title="Edit"
                         >
                           <Edit2 size={13} />
                         </button>
                         <button
                           onClick={() => handleDelete(item.id, item.name)}
-                          className="p-1.5 rounded hover:bg-red-500/20 text-tally-text-muted hover:text-red-400 transition-colors"
+                          className="p-1 rounded hover:bg-red-100 text-gray-400 hover:text-red-500 transition-colors"
                           title="Delete"
                         >
                           <Trash2 size={13} />

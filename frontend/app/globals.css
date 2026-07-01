@@ -149,17 +149,17 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
 }
 
-/* ================================
-   TallyPrime Inspired Custom Styles
-   ================================ */
+/* TallyPrime Inspired Custom Styles */
 
 /* Keyboard shortcut badges */
 .shortcut-key {
@@ -200,6 +200,7 @@
   font-size: 0.875rem;
   transition: all 0.15s ease;
 }
+
 .tally-input:focus {
   background: rgba(255, 255, 255, 0.1);
   border-color: #00a8cc;
@@ -217,11 +218,13 @@
 .tally-fade-in {
   animation: tallyFadeIn 0.25s ease-out;
 }
+
 @keyframes tallyFadeIn {
   from {
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -232,11 +235,13 @@
 .tally-slide-in {
   animation: tallySlideIn 0.2s ease-out;
 }
+
 @keyframes tallySlideIn {
   from {
     opacity: 0;
     transform: translateX(20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -247,29 +252,38 @@
 .tally-cursor-pulse {
   animation: cursorPulse 1.2s ease-in-out infinite;
 }
+
 @keyframes cursorPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
 }
 
 /* Custom scrollbar for the tally theme */
 .tally-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
+
 .tally-scrollbar::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.15);
 }
+
 .tally-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 3px;
 }
+
 .tally-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* =======================================
-   TallyPrime Right Shortcut Panel Styles
-   ======================================= */
+/* TallyPrime Right Shortcut Panel Styles */
 
 .tally-right-panel {
   background-color: #ebf3fa;
@@ -342,9 +356,54 @@
     color: #1a2332;
     border-color: #ffb347;
   }
+
   100% {
     background-color: #f4f9fd;
     color: #1e3a4f;
     border-color: #cce2f5;
   }
+}
+
+.blueprint-grid {
+  position: relative;
+  background-color: #070e17;
+  overflow: hidden;
+}
+
+.blueprint-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(19, 80, 102, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(19, 80, 102, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Blue glow top-left */
+.blueprint-grid::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(14, 116, 144, 0.16) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Orange/warm glow bottom-right class helper */
+.blueprint-glow-orange {
+  position: absolute;
+  bottom: -20%;
+  right: -20%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(188, 108, 37, 0.14) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 2;
 }

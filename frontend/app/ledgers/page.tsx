@@ -41,7 +41,7 @@ export default function LedgersPage() {
   const [ledgers, setLedgers] = useState<Ledger[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState<LedgerType | "ALL">("ALL");
+  const [filterType, setFilterType] = useState<LedgerType | "ALL" | "BANK_CASH" | "INCOME_EXPENSE">("ALL");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<LedgerFormData>(emptyForm);
@@ -50,8 +50,8 @@ export default function LedgersPage() {
   const fetchLedgers = useCallback(async () => {
     try {
       setLoading(true);
-      const type = filterType === "ALL" ? undefined : filterType;
-      const data = await ledgerApi.getAll(type, search || undefined);
+      // Fetch all ledgers without passing type so we can filter locally on frontend tabs
+      const data = await ledgerApi.getAll(undefined, search || undefined);
       setLedgers(data);
     } catch {
       // Backend may not be running — show mock data hint
@@ -59,7 +59,7 @@ export default function LedgersPage() {
     } finally {
       setLoading(false);
     }
-  }, [filterType, search]);
+  }, [search]);
 
   useEffect(() => {
     fetchLedgers();
@@ -143,190 +143,180 @@ export default function LedgersPage() {
     }).format(value);
   };
 
-  const filteredLedgers = ledgers;
+  const filteredLedgers = ledgers.filter((ledger) => {
+    if (filterType === "ALL") return true;
+    if (filterType === "CUSTOMER") return ledger.type === "CUSTOMER";
+    if (filterType === "SUPPLIER") return ledger.type === "SUPPLIER";
+    if (filterType === "BANK_CASH") return ledger.type === "BANK" || ledger.type === "CASH";
+    if (filterType === "INCOME_EXPENSE") return ledger.type === "INCOME" || ledger.type === "EXPENSE";
+    return true;
+  });
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-tally-dark via-[#1a2d40] to-tally-dark tally-fade-in">
+    <div className="min-h-full bg-[#f3ede2] text-[#112130] tally-fade-in font-mono">
       {/* Page Header */}
-      <div className="border-b border-tally-border/50 bg-tally-header/30 px-6 py-4">
+      <div className="border-b border-[#1b2b3a]/15 bg-white/30 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-tally-accent/10">
-              <BookOpen size={20} className="text-tally-accent" />
+            <div className="p-2 rounded bg-[#135066]/10 text-[#135066]">
+              <BookOpen size={20} />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-tally-text">
+              <h1 className="text-lg font-black text-[#112130] leading-none font-sans">
                 Ledger Management
               </h1>
-              <p className="text-xs text-tally-text-muted">
-                Manage your Customers & Suppliers
+              <p className="text-xs text-gray-500 mt-1.5 font-sans">
+                Manage your customers, suppliers & accounts
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => openCreateDialog("CUSTOMER")}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-tally-accent/20 text-tally-accent text-xs font-medium hover:bg-tally-accent/30 transition-colors"
-            >
-              <Users size={13} />
-              <Plus size={13} />
-              Customer
-            </button>
+            {/* Quick add buttons from second screenshot */}
             <button
               onClick={() => openCreateDialog("SUPPLIER")}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-tally-highlight/20 text-tally-highlight text-xs font-medium hover:bg-tally-highlight/30 transition-colors"
+              className="px-4 py-1.5 rounded border border-[#1b2b3a]/30 text-xs font-bold text-[#112130] hover:bg-black/5 cursor-pointer transition-colors shadow-sm"
             >
-              <Building2 size={13} />
-              <Plus size={13} />
-              Supplier
+              + Supplier
+            </button>
+            <button
+              onClick={() => openCreateDialog("CUSTOMER")}
+              className="px-4 py-1.5 rounded bg-[#e68a00] hover:bg-[#cc7a00] text-white text-xs font-bold cursor-pointer transition-all shadow-md"
+            >
+              + New Ledger <span className="text-[10px] opacity-80 font-normal ml-0.5">Alt+L</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="px-6 py-3 border-b border-tally-border/30 flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
+      {/* Search and Filters Bar */}
+      <div className="px-6 py-3 border-b border-[#1b2b3a]/10 bg-white/10 flex items-center gap-4">
+        <div className="relative flex-1">
           <Search
             size={14}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-tally-text-muted/50"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
           />
           <input
             type="text"
-            placeholder="Search ledgers..."
+            placeholder="Search ledgers by name, GSTIN, or city..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="tally-input w-full rounded-md text-xs"
+            className="w-full bg-white border border-[#1b2b3a]/25 rounded-md px-3 py-1.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#e68a00]"
             style={{ paddingLeft: "2.25rem" }}
           />
         </div>
-        <div className="flex items-center gap-1">
-          {(["ALL", "CUSTOMER", "SUPPLIER"] as const).map((type) => (
+
+        {/* Tab pills container */}
+        <div className="flex items-center gap-0.5 border border-[#1b2b3a]/25 bg-white/60 p-0.5 rounded-md">
+          {([
+            { id: "ALL", label: "All" },
+            { id: "CUSTOMER", label: "Customers" },
+            { id: "SUPPLIER", label: "Suppliers" },
+            { id: "BANK_CASH", label: "Bank & Cash" },
+            { id: "INCOME_EXPENSE", label: "Income & Expense" }
+          ] as const).map((tab) => (
             <button
-              key={type}
-              onClick={() => setFilterType(type)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                filterType === type
-                  ? "bg-tally-accent/20 text-tally-accent"
-                  : "text-tally-text-muted hover:bg-tally-sidebar-hover"
+              key={tab.id}
+              onClick={() => setFilterType(tab.id)}
+              className={`px-3 py-1 text-xs font-bold rounded cursor-pointer transition-colors ${
+                filterType === tab.id
+                  ? "bg-[#112130] text-white"
+                  : "text-[#8fa4b5] hover:text-[#112130]"
               }`}
             >
-              {type === "ALL" ? "All" : type === "CUSTOMER" ? "Customers" : "Suppliers"}
+              {tab.label}
             </button>
           ))}
         </div>
-        <div className="text-xs text-tally-text-muted ml-auto">
+
+        <div className="text-[11px] text-gray-500 font-bold shrink-0">
           {filteredLedgers.length} record(s)
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table Section */}
       <div className="px-6 py-4">
         {loading ? (
-          <div className="text-center py-12 text-tally-text-muted text-sm">
-            Loading...
+          <div className="text-center py-12 text-gray-500 text-xs">
+            Loading ledgers...
           </div>
         ) : filteredLedgers.length === 0 ? (
-          <div className="text-center py-16">
-            <BookOpen
-              size={40}
-              className="mx-auto text-tally-text-muted/30 mb-3"
-            />
-            <p className="text-sm text-tally-text-muted mb-1">
-              No ledgers found
-            </p>
-            <p className="text-xs text-tally-text-muted/50">
-              Press <span className="shortcut-key">Alt+L</span> to create a new
-              ledger
-            </p>
+          <div className="text-center py-16 bg-white border border-[#1b2b3a]/15 rounded-md p-6">
+            <BookOpen size={40} className="mx-auto text-gray-400/40 mb-3" />
+            <p className="text-sm text-gray-500 font-bold mb-1">No ledgers found</p>
+            <p className="text-xs text-gray-400">Press <span className="shortcut-key">Alt+L</span> to add a new ledger.</p>
           </div>
         ) : (
-          <div className="rounded-lg border border-tally-border/30 overflow-hidden">
+          <div className="overflow-x-auto rounded-md border border-[#1b2b3a]/15 shadow-sm bg-white">
             <table className="w-full text-xs">
               <thead>
-                <tr className="bg-tally-header/40 border-b border-tally-border/30">
-                  <th className="text-left px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Name
-                  </th>
-                  <th className="text-left px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Type
-                  </th>
-                  <th className="text-left px-4 py-2.5 text-tally-text-muted font-semibold">
-                    GST No.
-                  </th>
-                  <th className="text-left px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Mobile
-                  </th>
-                  <th className="text-left px-4 py-2.5 text-tally-text-muted font-semibold">
-                    State
-                  </th>
-                  <th className="text-right px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Opening Bal.
-                  </th>
-                  <th className="text-right px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Current Bal.
-                  </th>
-                  <th className="text-center px-4 py-2.5 text-tally-text-muted font-semibold">
-                    Actions
-                  </th>
+                <tr className="bg-[#112130]/5 border-b border-[#1b2b3a]/15">
+                  <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">LEDGER</th>
+                  <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">TYPE</th>
+                  <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">STATE</th>
+                  <th className="text-right px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">OPENING BALANCE</th>
+                  <th className="text-right px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">CURRENT BALANCE</th>
+                  <th className="text-center px-4 py-3 text-gray-500 font-bold uppercase tracking-wider w-24">ACTIONS</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredLedgers.map((ledger, i) => (
                   <tr
                     key={ledger.id}
-                    className={`border-b border-tally-border/20 hover:bg-tally-sidebar-hover/50 transition-colors cursor-pointer ${
-                      i % 2 === 0 ? "bg-tally-dark/20" : ""
+                    className={`border-b border-[#1b2b3a]/10 hover:bg-[#112130]/5 transition-colors cursor-pointer ${
+                      i % 2 === 0 ? "bg-white" : "bg-gray-50/30"
                     }`}
                   >
-                    <td className="px-4 py-2.5 text-tally-text font-medium">
-                      {ledger.name}
+                    <td className="px-4 py-2.5">
+                      <div className="font-bold text-gray-800 text-[13px]">{ledger.name}</div>
+                      {ledger.gstNumber && (
+                        <div className="text-[10px] text-gray-400 mt-0.5 font-sans uppercase">
+                          GSTIN {ledger.gstNumber}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-2.5">
                       <Badge
                         variant="outline"
-                        className={`text-[10px] ${
+                        className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${
                           ledger.type === "CUSTOMER"
-                            ? "border-tally-accent/40 text-tally-accent"
-                            : "border-tally-highlight/40 text-tally-highlight"
+                            ? "border-[#135066]/30 text-[#135066] bg-[#135066]/5"
+                            : ledger.type === "SUPPLIER"
+                            ? "border-[#bc6c25]/30 text-[#bc6c25] bg-[#bc6c25]/5"
+                            : ledger.type === "BANK"
+                            ? "border-emerald-500/30 text-emerald-600 bg-emerald-500/5"
+                            : ledger.type === "CASH"
+                            ? "border-teal-500/30 text-teal-600 bg-teal-500/5"
+                            : ledger.type === "EXPENSE"
+                            ? "border-rose-500/30 text-rose-600 bg-rose-500/5"
+                            : "border-blue-500/30 text-blue-600 bg-blue-500/5"
                         }`}
                       >
                         {ledger.type}
                       </Badge>
                     </td>
-                    <td className="px-4 py-2.5 text-tally-text-muted">
-                      {ledger.gstNumber || "—"}
-                    </td>
-                    <td className="px-4 py-2.5 text-tally-text-muted">
-                      {ledger.mobile || "—"}
-                    </td>
-                    <td className="px-4 py-2.5 text-tally-text-muted">
+                    <td className="px-4 py-2.5 text-gray-600 font-medium">
                       {ledger.state || "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-right text-tally-text-muted">
+                    <td className="px-4 py-2.5 text-right text-gray-500 font-medium">
                       {formatCurrency(ledger.openingBalance)}
                     </td>
-                    <td className="px-4 py-2.5 text-right font-medium text-tally-text">
+                    <td className={`px-4 py-2.5 text-right font-black text-[13px] ${
+                      ledger.currentBalance < 0 ? "text-[#e68a00]" : "text-emerald-600"
+                    }`}>
                       {formatCurrency(ledger.currentBalance)}
                     </td>
-                    <td className="px-4 py-2.5">
+                    <td className="px-4 py-2.5" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-center gap-1">
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openEditDialog(ledger);
-                          }}
-                          className="p-1.5 rounded hover:bg-tally-accent/20 text-tally-text-muted hover:text-tally-accent transition-colors"
+                          onClick={() => openEditDialog(ledger)}
+                          className="p-1 rounded hover:bg-blue-100 text-gray-400 hover:text-blue-600 transition-colors"
                           title="Edit"
                         >
                           <Edit2 size={13} />
                         </button>
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(ledger.id, ledger.name);
-                          }}
-                          className="p-1.5 rounded hover:bg-red-500/20 text-tally-text-muted hover:text-red-400 transition-colors"
+                          onClick={() => handleDelete(ledger.id, ledger.name)}
+                          className="p-1 rounded hover:bg-red-100 text-gray-400 hover:text-red-500 transition-colors"
                           title="Delete"
                         >
                           <Trash2 size={13} />
@@ -366,23 +356,18 @@ export default function LedgersPage() {
               <label className="text-xs text-tally-text-muted w-28 shrink-0">
                 Type :
               </label>
-              <div className="flex gap-2">
-                {(["CUSTOMER", "SUPPLIER"] as const).map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setForm({ ...form, type })}
-                    className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                      form.type === type
-                        ? type === "CUSTOMER"
-                          ? "bg-tally-accent/20 text-tally-accent border border-tally-accent/40"
-                          : "bg-tally-highlight/20 text-tally-highlight border border-tally-highlight/40"
-                        : "bg-tally-dark/40 text-tally-text-muted border border-transparent"
-                    }`}
-                  >
-                    {type === "CUSTOMER" ? "Customer" : "Supplier"}
-                  </button>
-                ))}
-              </div>
+              <select
+                value={form.type}
+                onChange={(e) => setForm({ ...form, type: e.target.value as LedgerType })}
+                className="tally-input flex-1 rounded-md text-xs py-1.5 focus:outline-none bg-[#1e3a4f] border border-[#2a5470] text-[#e8e0d4] font-bold"
+              >
+                <option value="CUSTOMER">Customer (Sundry Debtor)</option>
+                <option value="SUPPLIER">Supplier (Sundry Creditor)</option>
+                <option value="BANK">Bank Account</option>
+                <option value="CASH">Cash in Hand</option>
+                <option value="EXPENSE">Expense (Direct/Indirect)</option>
+                <option value="INCOME">Income (Direct/Indirect)</option>
+              </select>
             </div>
 
             {/* Name */}
