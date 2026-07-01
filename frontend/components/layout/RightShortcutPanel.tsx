@@ -530,12 +530,12 @@ export default function RightShortcutPanel() {
   }, [shortcuts, showCalculator, showCommandPalette, showHelp, showPeriod, showCompany, showCompanyInfo, showConfigure, router, logout]);
 
 
-  // Underline formatter for Alt+ Keys
+  // Underline formatter for Alt+ Keys with heavy bold styles
   const renderKeyBadge = (key: string) => {
     if (key.startsWith("Alt+")) {
       const char = key.replace("Alt+", "");
       return (
-        <span className="relative inline-block border-b border-current font-bold leading-none">
+        <span className="relative inline-block border-b border-current font-black leading-none text-[10px]">
           {char}
         </span>
       );
@@ -543,12 +543,12 @@ export default function RightShortcutPanel() {
     if (key.startsWith("Ctrl+")) {
       const char = key.replace("Ctrl+", "");
       return (
-        <span className="relative inline-block border-b-2 border-double border-current font-bold leading-none">
+        <span className="relative inline-block border-b-2 border-double border-current font-black leading-none text-[10px]">
           {char}
         </span>
       );
     }
-    return <span>{key}</span>;
+    return <span className="font-black text-[10px]">{key}</span>;
   };
 
   // Render help button at the top header

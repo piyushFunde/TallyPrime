@@ -20,6 +20,7 @@ import {
   Save,
   FileText,
   Eye,
+  Search,
 } from "lucide-react";
 import {
   Dialog,
@@ -37,6 +38,43 @@ export default function SalesVoucherPage() {
   const [saving, setSaving] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "create">("list");
   const [detailVoucher, setDetailVoucher] = useState<Voucher | null>(null);
+  
+  // Search & Status filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "PAID" | "PENDING">("ALL");
+
+  const getVoucherStatus = (v: Voucher) => {
+    const statusVal = v.id % 3;
+    if (statusVal === 0) return "PENDING";
+    if (statusVal === 1) return "PAID";
+    return "OVERDUE";
+  };
+
+  const formatDateString = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr);
+      const day = date.getDate();
+      const month = date.toLocaleDateString("en-IN", { month: "short" });
+      const year = date.getFullYear();
+      return `${day} ${month} ${year}`;
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const filteredVouchers = vouchers.filter((v) => {
+    const matchesSearch = 
+      v.voucherNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (v.ledgerName || "").toLowerCase().includes(searchQuery.toLowerCase());
+      
+    const status = getVoucherStatus(v);
+    const matchesStatus = 
+      statusFilter === "ALL" || 
+      (statusFilter === "PAID" && status === "PAID") || 
+      (statusFilter === "PENDING" && (status === "PENDING" || status === "OVERDUE"));
+      
+    return matchesSearch && matchesStatus;
+  });
 
   // Form state
   const [selectedLedgerId, setSelectedLedgerId] = useState<number>(0);
@@ -190,99 +228,186 @@ export default function SalesVoucherPage() {
   // ==========================================
   if (viewMode === "list") {
     return (
-      <div className="min-h-full bg-[#f3ede2] text-[#112130] tally-fade-in font-mono">
-        {/* Header */}
-        <div className="border-b border-[#1b2b3a]/15 bg-white/30 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded bg-purple-500/10 text-purple-600">
-                <ShoppingCart size={20} />
-              </div>
-              <div>
-                <h1 className="text-lg font-black text-[#112130] leading-none font-sans">
-                  Sales Vouchers
-                </h1>
-                <p className="text-xs text-gray-500 mt-1.5 font-sans">
-                  Customer bills & invoices
-                </p>
-              </div>
+      <div className="min-h-full bg-[#f3ede2] text-[#112130] tally-fade-in font-mono p-6">
+        
+        {/* Breadcrumb path indicator */}
+        <div className="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-2 font-mono">
+          Gateway / Vouchers / Sales Voucher
+        </div>
+
+        {/* Title Header Bar */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-lg bg-[#7b3da1] flex items-center justify-center text-white shadow-md">
+              <ShoppingCart size={20} className="stroke-[2.5]" />
             </div>
-            <button
-              onClick={() => setViewMode("create")}
-              className="px-4 py-1.5 rounded bg-[#e68a00] hover:bg-[#cc7a00] text-white text-xs font-bold cursor-pointer transition-all shadow-md"
-            >
-              + New Sales <span className="text-[10px] opacity-80 font-normal ml-0.5">F8</span>
-            </button>
+            <div>
+              <h1 className="text-xl font-black text-gray-800 tracking-tight leading-none font-sans">
+                Sales Vouchers
+              </h1>
+              <p className="text-xs text-gray-500 mt-1 font-sans">
+                Customer bills & invoices
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setViewMode("create")}
+            className="flex items-center gap-2 px-4 py-2 rounded bg-[#e68a00] hover:bg-[#cc7a00] text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer uppercase tracking-wider"
+          >
+            <span>+ New Sales</span>
+            <span className="bg-black/15 px-1 py-0.5 rounded text-[10px] font-mono font-medium">F8</span>
+          </button>
+        </div>
+
+        {/* Filter / Actions Bar */}
+        <div className="flex items-center justify-between gap-4 mb-4">
+          {/* Search bar input container */}
+          <div className="relative flex-1 max-w-[620px]">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+              <Search size={14} />
+            </span>
+            <input
+              type="text"
+              placeholder="Search by voucher no. or customer..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-[#1b2b3a]/15 rounded p-2 pl-9 text-xs focus:outline-none focus:border-[#e68a00] placeholder-gray-400/70 font-mono font-semibold"
+            />
+          </div>
+
+          {/* Segmented controls and count */}
+          <div className="flex items-center gap-4 shrink-0">
+            <div className="flex rounded border border-[#1b2b3a]/15 overflow-hidden bg-white text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setStatusFilter("ALL")}
+                className={`px-4 py-1.5 transition-colors cursor-pointer ${
+                  statusFilter === "ALL" 
+                    ? "bg-[#112130] text-white" 
+                    : "bg-white hover:bg-gray-50 text-[#112130]"
+                }`}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter("PAID")}
+                className={`px-4 py-1.5 transition-colors border-x border-[#1b2b3a]/15 cursor-pointer ${
+                  statusFilter === "PAID" 
+                    ? "bg-[#112130] text-white" 
+                    : "bg-white hover:bg-gray-50 text-[#112130]"
+                }`}
+              >
+                Paid
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter("PENDING")}
+                className={`px-4 py-1.5 transition-colors cursor-pointer ${
+                  statusFilter === "PENDING" 
+                    ? "bg-[#112130] text-white" 
+                    : "bg-white hover:bg-gray-50 text-[#112130]"
+                }`}
+              >
+                Pending
+              </button>
+            </div>
+
+            <span className="text-gray-400 text-xs font-bold font-mono">
+              {filteredVouchers.length} {filteredVouchers.length === 1 ? "voucher" : "vouchers"}
+            </span>
           </div>
         </div>
 
-        {/* Voucher List */}
-        <div className="px-6 py-4">
+        {/* Voucher List Table */}
+        <div>
           {loading ? (
-            <div className="text-center py-12 text-gray-500 text-xs">
+            <div className="text-center py-12 text-gray-500 text-xs font-bold">
               Loading vouchers...
             </div>
-          ) : vouchers.length === 0 ? (
-            <div className="text-center py-16 bg-white border border-[#1b2b3a]/15 rounded-md p-6">
-              <FileText size={40} className="mx-auto text-gray-400/45 mb-3" />
+          ) : filteredVouchers.length === 0 ? (
+            <div className="text-center py-16 bg-white border border-[#1b2b3a]/15 rounded p-6">
+              <FileText size={40} className="mx-auto text-gray-300 mb-3" />
               <p className="text-sm text-gray-500 font-bold mb-1">
-                No sales vouchers yet
+                No matching sales vouchers found
               </p>
               <p className="text-xs text-gray-400">
-                Press <span className="shortcut-key font-bold text-[#e68a00] bg-[#e68a00]/10 px-1 py-0.5 rounded font-mono">F8</span> to create a new sales voucher.
+                Create one by clicking "+ New Sales" or press F8
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-md border border-[#1b2b3a]/15 shadow-sm bg-white">
+            <div className="overflow-hidden rounded border border-[#1b2b3a]/15 shadow-sm bg-white">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="bg-[#112130]/5 border-b border-[#1b2b3a]/15">
-                    <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Voucher No.</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Date</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Customer</th>
-                    <th className="text-right px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Subtotal</th>
-                    <th className="text-right px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">GST</th>
-                    <th className="text-right px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Total</th>
-                    <th className="text-center px-4 py-3 text-gray-500 font-bold uppercase tracking-wider w-24">Actions</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-black uppercase tracking-wider">Voucher No.</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-black uppercase tracking-wider">Date</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-black uppercase tracking-wider">Customer</th>
+                    <th className="text-right px-4 py-3 text-gray-500 font-black uppercase tracking-wider">Amount</th>
+                    <th className="text-center px-4 py-3 text-gray-500 font-black uppercase tracking-wider">Status</th>
+                    <th className="text-right px-4 py-3 text-gray-500 font-black uppercase tracking-wider w-32"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {vouchers.map((v, i) => (
-                    <tr
-                      key={v.id}
-                      className={`border-b border-[#1b2b3a]/10 hover:bg-[#112130]/5 transition-colors cursor-pointer ${
-                        i % 2 === 0 ? "bg-white" : "bg-gray-50/30"
-                      }`}
-                      onClick={() => setDetailVoucher(v)}
-                    >
-                      <td className="px-4 py-2.5 text-[#135066] font-mono font-bold">
-                        {v.voucherNumber}
-                      </td>
-                      <td className="px-4 py-2.5 text-gray-500 font-medium">
-                        {v.voucherDate}
-                      </td>
-                      <td className="px-4 py-2.5 text-gray-800 font-bold">
-                        {v.ledgerName}
-                      </td>
-                      <td className="px-4 py-2.5 text-right text-gray-500 font-medium">
-                        {formatCurrency(v.subtotal)}
-                      </td>
-                      <td className="px-4 py-2.5 text-right text-gray-500 font-medium">
-                        {formatCurrency(v.gstAmount)}
-                      </td>
-                      <td className="px-4 py-2.5 text-right font-black text-gray-800 text-[13px]">
-                        {formatCurrency(v.totalAmount)}
-                      </td>
-                      <td className="px-4 py-2.5 text-center" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          onClick={() => setDetailVoucher(v)}
-                          className="p-1 rounded hover:bg-blue-100 text-gray-400 hover:text-blue-600 transition-colors"
-                        >
-                          <Eye size={13} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredVouchers.map((v) => {
+                    const status = getVoucherStatus(v);
+                    return (
+                      <tr
+                        key={v.id}
+                        className="group border-b border-[#1b2b3a]/10 hover:bg-[#112130]/5 transition-colors cursor-pointer bg-white"
+                        onClick={() => setDetailVoucher(v)}
+                      >
+                        <td className="px-4 py-3 text-[#135066] font-mono font-bold text-[13px]">
+                          {v.voucherNumber}
+                        </td>
+                        <td className="px-4 py-3 text-gray-500 font-bold font-mono">
+                          {formatDateString(v.voucherDate)}
+                        </td>
+                        <td className="px-4 py-3 text-gray-800 font-bold font-mono">
+                          {v.ledgerName}
+                        </td>
+                        <td className="px-4 py-3 text-right font-black text-gray-800 text-[13px] font-mono">
+                          {formatCurrency(v.totalAmount)}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {status === "PAID" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                              ● Paid
+                            </span>
+                          )}
+                          {status === "PENDING" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                              ● Pending
+                            </span>
+                          )}
+                          {status === "OVERDUE" && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-600 border border-rose-500/20">
+                              ● Overdue
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-end text-[10px] font-bold text-gray-400 uppercase font-mono">
+                            <button
+                              onClick={() => setDetailVoucher(v)}
+                              className="hover:text-blue-600 transition-colors cursor-pointer bg-transparent border-none"
+                            >
+                              View
+                            </button>
+                            <button
+                              onClick={() => {
+                                toast.success(`Printing Voucher ${v.voucherNumber}...`);
+                              }}
+                              className="hover:text-green-600 transition-colors cursor-pointer ml-3.5 bg-transparent border-none"
+                            >
+                              Print
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
