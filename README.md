@@ -3,6 +3,8 @@
 SmartERP is a modern, web-based Enterprise Resource Planning (ERP) platform designed for accounting, inventory management, billing, and financial reporting. Inspired by the interface and conventions of **TallyPrime**, it focuses on a keyboard-first workflow that allows users to navigate the system without a mouse.
 
 ---
+🌐 **Website:** [[[SmartERP]]](https://frontend-production-f061.up.railway.app)
+
 
 ##  Technology Stack
 
