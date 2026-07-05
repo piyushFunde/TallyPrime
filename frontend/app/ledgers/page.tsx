@@ -473,6 +473,7 @@ export default function LedgersPage() {
                     openingBalance: parseFloat(e.target.value) || 0,
                   })
                 }
+                onFocus={(e) => e.target.select()}
                 className="tally-input flex-1 rounded-md"
                 step="0.01"
               />

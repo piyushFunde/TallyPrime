@@ -394,6 +394,7 @@ export default function StockItemsPage() {
                     purchasePrice: parseFloat(e.target.value) || 0,
                   })
                 }
+                onFocus={(e) => e.target.select()}
                 className="tally-input flex-1 rounded-md"
                 step="0.01"
                 min="0"
@@ -414,6 +415,7 @@ export default function StockItemsPage() {
                     sellingPrice: parseFloat(e.target.value) || 0,
                   })
                 }
+                onFocus={(e) => e.target.select()}
                 className="tally-input flex-1 rounded-md"
                 step="0.01"
                 min="0"
@@ -457,6 +459,7 @@ export default function StockItemsPage() {
                       currentStock: parseFloat(e.target.value) || 0,
                     })
                   }
+                  onFocus={(e) => e.target.select()}
                   className="tally-input flex-1 rounded-md"
                   step="1"
                   min="0"

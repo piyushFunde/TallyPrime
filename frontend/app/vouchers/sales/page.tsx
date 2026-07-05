@@ -686,6 +686,7 @@ export default function SalesVoucherPage() {
                             parseFloat(e.target.value) || 0
                           )
                         }
+                        onFocus={(e) => e.target.select()}
                         className="tally-input w-full rounded text-xs text-right"
                         min="0"
                         step="1"
@@ -702,6 +703,7 @@ export default function SalesVoucherPage() {
                             parseFloat(e.target.value) || 0
                           )
                         }
+                        onFocus={(e) => e.target.select()}
                         className="tally-input w-full rounded text-xs text-right"
                         min="0"
                         step="0.01"

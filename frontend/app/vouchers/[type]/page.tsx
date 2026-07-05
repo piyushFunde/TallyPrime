@@ -598,6 +598,7 @@ export default function DynamicVoucherPage() {
                             parseFloat(e.target.value) || 0
                           )
                         }
+                        onFocus={(e) => e.target.select()}
                         className="tally-input w-full rounded text-xs text-right font-bold"
                         min="0"
                         step="1"
@@ -614,6 +615,7 @@ export default function DynamicVoucherPage() {
                             parseFloat(e.target.value) || 0
                           )
                         }
+                        onFocus={(e) => e.target.select()}
                         className="tally-input w-full rounded text-xs text-right font-bold"
                         min="0"
                         step="0.01"
