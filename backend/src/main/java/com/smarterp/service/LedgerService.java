@@ -3,8 +3,10 @@ package com.smarterp.service;
 import com.smarterp.dto.LedgerDTO;
 import com.smarterp.entity.Ledger;
 import com.smarterp.entity.LedgerType;
+import com.smarterp.entity.Voucher;
 import com.smarterp.exception.ResourceNotFoundException;
 import com.smarterp.repository.LedgerRepository;
+import com.smarterp.repository.VoucherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class LedgerService {
 
     private final LedgerRepository ledgerRepository;
+    private final VoucherRepository voucherRepository;
 
     /**
      * Get all ledgers, optionally filtered by type.
@@ -95,10 +98,16 @@ public class LedgerService {
 
     /**
      * Delete a ledger by ID.
+     * Also deletes all vouchers (and their line items via CascadeType.ALL) that reference this ledger.
      */
     public void deleteLedger(Long id) {
         if (!ledgerRepository.existsById(id)) {
             throw new ResourceNotFoundException("Ledger", id);
+        }
+        // Delete all vouchers linked to this ledger (line items cascade automatically)
+        List<Voucher> linkedVouchers = voucherRepository.findByLedgerId(id);
+        if (!linkedVouchers.isEmpty()) {
+            voucherRepository.deleteAll(linkedVouchers);
         }
         ledgerRepository.deleteById(id);
     }

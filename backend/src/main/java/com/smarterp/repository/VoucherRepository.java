@@ -19,4 +19,7 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
     @Query("SELECT COALESCE(MAX(CAST(SUBSTRING(v.voucherNumber, 4) AS int)), 0) FROM Voucher v WHERE v.voucherType = :type")
     int findMaxVoucherNumber(VoucherType type);
+
+    List<Voucher> findByLedgerId(Long ledgerId);
 }
+

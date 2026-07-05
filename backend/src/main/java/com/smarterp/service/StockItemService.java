@@ -2,8 +2,11 @@ package com.smarterp.service;
 
 import com.smarterp.dto.StockItemDTO;
 import com.smarterp.entity.StockItem;
+import com.smarterp.entity.Voucher;
 import com.smarterp.exception.ResourceNotFoundException;
 import com.smarterp.repository.StockItemRepository;
+import com.smarterp.repository.VoucherLineItemRepository;
+import com.smarterp.repository.VoucherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +20,8 @@ import java.util.stream.Collectors;
 public class StockItemService {
 
     private final StockItemRepository stockItemRepository;
+    private final VoucherRepository voucherRepository;
+    private final VoucherLineItemRepository voucherLineItemRepository;
 
     /**
      * Get all stock items, optionally filtered by search term.
@@ -88,10 +93,17 @@ public class StockItemService {
 
     /**
      * Delete a stock item by ID.
+     * Deletes all vouchers that contain line items referencing this stock item (cascade removes line items too).
      */
     public void deleteStockItem(Long id) {
         if (!stockItemRepository.existsById(id)) {
             throw new ResourceNotFoundException("StockItem", id);
+        }
+        // Get all voucher IDs that have line items referencing this stock item
+        List<Long> voucherIds = voucherLineItemRepository.findVoucherIdsByStockItemId(id);
+        if (!voucherIds.isEmpty()) {
+            List<Voucher> vouchers = voucherRepository.findAllById(voucherIds);
+            voucherRepository.deleteAll(vouchers);
         }
         stockItemRepository.deleteById(id);
     }
