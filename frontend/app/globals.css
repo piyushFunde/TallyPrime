@@ -407,3 +407,15 @@
   pointer-events: none;
   z-index: 2;
 }
+
+/* Hide number input spinners globally (scrolling price options) */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
