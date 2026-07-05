@@ -143,6 +143,34 @@ export default function LedgersPage() {
     }).format(value);
   };
 
+  const formatLedgerBalance = (balance: number, type: LedgerType) => {
+    const absVal = Math.abs(balance);
+    const formattedAmount = formatCurrency(absVal);
+
+    if (balance === 0) return formattedAmount;
+
+    let suffix = "Dr";
+    if (type === "SUPPLIER" || type === "INCOME") {
+      suffix = balance < 0 ? "Cr" : "Dr";
+    } else {
+      suffix = balance > 0 ? "Dr" : "Cr";
+    }
+    return `${formattedAmount} ${suffix}`;
+  };
+
+  const formatOpeningBalance = (balance: number, type: LedgerType) => {
+    const absVal = Math.abs(balance);
+    const formattedAmount = formatCurrency(absVal);
+
+    if (balance === 0) return formattedAmount;
+
+    let suffix = "Dr";
+    if (type === "SUPPLIER" || type === "INCOME") {
+      suffix = "Cr";
+    }
+    return `${formattedAmount} ${suffix}`;
+  };
+
   const filteredLedgers = ledgers.filter((ledger) => {
     if (filterType === "ALL") return true;
     if (filterType === "CUSTOMER") return ledger.type === "CUSTOMER";
@@ -298,12 +326,12 @@ export default function LedgersPage() {
                       {ledger.state || "—"}
                     </td>
                     <td className="px-4 py-2.5 text-right text-gray-500 font-medium">
-                      {formatCurrency(ledger.openingBalance)}
+                      {formatOpeningBalance(ledger.openingBalance, ledger.type)}
                     </td>
                     <td className={`px-4 py-2.5 text-right font-black text-[13px] ${
                       ledger.currentBalance < 0 ? "text-[#e68a00]" : "text-emerald-600"
                     }`}>
-                      {formatCurrency(ledger.currentBalance)}
+                      {formatLedgerBalance(ledger.currentBalance, ledger.type)}
                     </td>
                     <td className="px-4 py-2.5" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-center gap-1">
