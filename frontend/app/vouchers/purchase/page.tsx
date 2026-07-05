@@ -527,90 +527,124 @@ export default function PurchaseVoucherPage() {
           )}
         </div>
 
-        {/* Detail Dialog */}
+        {/* Detail Dialog — Premium Purchase Bill View */}
         {detailVoucher && (
-          <Dialog
-            open={!!detailVoucher}
-            onOpenChange={() => setDetailVoucher(null)}
-          >
-            <DialogContent className="bg-tally-sidebar border-tally-border text-tally-text max-w-2xl">
-              <DialogHeader>
-                <DialogTitle className="text-tally-text flex items-center gap-2">
-                  <FileText size={16} className="text-orange-400" />
-                  {detailVoucher.voucherNumber} — Purchase Entry
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-3 mt-2">
-                <div className="grid grid-cols-3 gap-4 text-xs">
-                  <div>
-                    <span className="text-tally-text-muted">Supplier:</span>
-                    <p className="font-medium">{detailVoucher.ledgerName}</p>
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="w-full max-w-3xl bg-white rounded-xl shadow-2xl overflow-hidden tally-fade-in">
+
+              {/* Invoice Header Bar */}
+              <div className="bg-[#7c3f0a] px-6 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-orange-400/20">
+                    <FileText size={18} className="text-orange-300" />
                   </div>
                   <div>
-                    <span className="text-tally-text-muted">Date:</span>
-                    <p className="font-medium">{detailVoucher.voucherDate}</p>
-                  </div>
-                  <div>
-                    <span className="text-tally-text-muted">Total:</span>
-                    <p className="font-bold text-tally-highlight">
-                      {formatCurrency(detailVoucher.totalAmount)}
-                    </p>
+                    <div className="text-white font-black text-base tracking-wide">{detailVoucher.voucherNumber}</div>
+                    <div className="text-orange-200/70 text-[10px] font-mono uppercase tracking-widest">Purchase Entry</div>
                   </div>
                 </div>
-
-                <div className="rounded border border-tally-border/30 overflow-hidden">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="bg-tally-header/40">
-                        <th className="text-left px-3 py-2 text-tally-text-muted">
-                          Item
-                        </th>
-                        <th className="text-right px-3 py-2 text-tally-text-muted">
-                          Qty
-                        </th>
-                        <th className="text-right px-3 py-2 text-tally-text-muted">
-                          Rate
-                        </th>
-                        <th className="text-right px-3 py-2 text-tally-text-muted">
-                          Amount
-                        </th>
-                        <th className="text-right px-3 py-2 text-tally-text-muted">
-                          GST
-                        </th>
-                        <th className="text-right px-3 py-2 text-tally-text-muted">
-                          Total
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {detailVoucher.lineItems?.map((li, i) => (
-                        <tr key={i} className="border-t border-tally-border/20">
-                          <td className="px-3 py-2 text-tally-text">
-                            {li.stockItemName}
-                          </td>
-                          <td className="px-3 py-2 text-right text-tally-text-muted">
-                            {li.quantity}
-                          </td>
-                          <td className="px-3 py-2 text-right text-tally-text-muted">
-                            {formatCurrency(li.rate)}
-                          </td>
-                          <td className="px-3 py-2 text-right text-tally-text-muted">
-                            {formatCurrency(li.amount || 0)}
-                          </td>
-                          <td className="px-3 py-2 text-right text-tally-text-muted">
-                            {formatCurrency(li.gstAmount || 0)}
-                          </td>
-                          <td className="px-3 py-2 text-right text-tally-text font-medium">
-                            {formatCurrency(li.total || 0)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="flex items-center gap-3">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-orange-400/20 text-orange-200 border border-orange-300/30">
+                    ● {getVoucherStatus(detailVoucher)}
+                  </span>
+                  <button
+                    onClick={() => setDetailVoucher(null)}
+                    className="text-orange-200/70 hover:text-white transition-colors p-1"
+                  >
+                    <X size={18} />
+                  </button>
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
+
+              {/* Meta Info Strip */}
+              <div className="bg-[#f8f9fb] border-b border-gray-200 px-6 py-4 grid grid-cols-3 gap-4">
+                <div>
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Supplier</div>
+                  <div className="font-bold text-gray-800 text-sm">{detailVoucher.ledgerName || "—"}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Purchase Date</div>
+                  <div className="font-bold text-gray-800 text-sm">{detailVoucher.voucherDate || "—"}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Grand Total</div>
+                  <div className="font-black text-[#7c3f0a] text-lg">{formatCurrency(detailVoucher.totalAmount)}</div>
+                </div>
+              </div>
+
+              {/* Line Items Table */}
+              <div className="px-6 py-4 overflow-x-auto">
+                <table className="w-full text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-[#7c3f0a] text-white">
+                      <th className="text-left px-4 py-2.5 font-bold uppercase tracking-wider rounded-tl-md">Item Description</th>
+                      <th className="text-right px-4 py-2.5 font-bold uppercase tracking-wider w-16">Qty</th>
+                      <th className="text-right px-4 py-2.5 font-bold uppercase tracking-wider w-24">Rate</th>
+                      <th className="text-right px-4 py-2.5 font-bold uppercase tracking-wider w-28">Amount</th>
+                      <th className="text-right px-4 py-2.5 font-bold uppercase tracking-wider w-24">GST</th>
+                      <th className="text-right px-4 py-2.5 font-bold uppercase tracking-wider w-28 rounded-tr-md">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detailVoucher.lineItems?.map((li, i) => (
+                      <tr key={i} className={`border-b border-gray-100 ${i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}`}>
+                        <td className="px-4 py-3 font-semibold text-gray-800 text-[13px]">{li.stockItemName || "—"}</td>
+                        <td className="px-4 py-3 text-right text-gray-600 font-mono">{li.quantity}</td>
+                        <td className="px-4 py-3 text-right text-gray-600 font-mono">{formatCurrency(li.rate)}</td>
+                        <td className="px-4 py-3 text-right text-gray-600 font-mono">{formatCurrency(li.amount || 0)}</td>
+                        <td className="px-4 py-3 text-right text-emerald-600 font-mono font-semibold">{formatCurrency(li.gstAmount || 0)}</td>
+                        <td className="px-4 py-3 text-right text-gray-900 font-black font-mono">{formatCurrency(li.total || 0)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Totals */}
+              <div className="px-6 pb-4 flex justify-end">
+                <div className="w-64 text-xs">
+                  <div className="flex justify-between py-1.5 border-b border-gray-100 text-gray-600">
+                    <span>Subtotal</span>
+                    <span className="font-mono font-semibold">
+                      {formatCurrency((detailVoucher.lineItems || []).reduce((s, li) => s + (li.amount || 0), 0))}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1.5 border-b border-gray-100 text-emerald-600">
+                    <span>GST</span>
+                    <span className="font-mono font-semibold">
+                      {formatCurrency((detailVoucher.lineItems || []).reduce((s, li) => s + (li.gstAmount || 0), 0))}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-2.5 px-3 mt-1 bg-[#7c3f0a] text-white rounded-md">
+                    <span className="font-bold uppercase text-[11px] tracking-wider">Grand Total</span>
+                    <span className="font-black text-orange-200 font-mono text-sm">{formatCurrency(detailVoucher.totalAmount)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Footer */}
+              <div className="bg-gray-50 border-t border-gray-200 px-6 py-3 flex items-center justify-between">
+                <div className="text-[10px] text-gray-400 font-mono">
+                  Generated by SmartERP v1.0 · Computer-generated document
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => printVoucher(detailVoucher)}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[#7c3f0a] text-orange-200 hover:bg-[#6b3508] text-xs font-bold rounded-md border border-orange-300/30 transition-colors cursor-pointer"
+                  >
+                    🖨 Print Bill
+                  </button>
+                  <button
+                    onClick={() => setDetailVoucher(null)}
+                    className="px-4 py-2 bg-white text-gray-600 hover:bg-gray-100 text-xs font-bold rounded-md border border-gray-200 transition-colors cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
         )}
       </div>
     );
