@@ -221,6 +221,126 @@ export default function SalesVoucherPage() {
     }).format(value);
   };
 
+  const printVoucher = (v: Voucher) => {
+    const companyName =
+      typeof window !== "undefined"
+        ? localStorage.getItem("tally_company") || "SmartERP India Pvt Ltd"
+        : "SmartERP India Pvt Ltd";
+
+    const lineRows = (v.lineItems || []).map((li) => `
+      <tr>
+        <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb">${li.stockItemName || "—"}</td>
+        <td style="padding:8px 12px;text-align:right;border-bottom:1px solid #e5e7eb">${li.quantity}</td>
+        <td style="padding:8px 12px;text-align:right;border-bottom:1px solid #e5e7eb">${new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",minimumFractionDigits:2}).format(li.rate)}</td>
+        <td style="padding:8px 12px;text-align:right;border-bottom:1px solid #e5e7eb">${new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",minimumFractionDigits:2}).format(li.amount||0)}</td>
+        <td style="padding:8px 12px;text-align:right;border-bottom:1px solid #e5e7eb">${new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",minimumFractionDigits:2}).format(li.gstAmount||0)}</td>
+        <td style="padding:8px 12px;text-align:right;border-bottom:1px solid #e5e7eb;font-weight:bold">${new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",minimumFractionDigits:2}).format(li.total||0)}</td>
+      </tr>
+    `).join("");
+
+    const subtotal = (v.lineItems || []).reduce((s, li) => s + (li.amount || 0), 0);
+    const totalGst = (v.lineItems || []).reduce((s, li) => s + (li.gstAmount || 0), 0);
+
+    const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Invoice ${v.voucherNumber}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 13px; color: #111; background: #fff; }
+    .page { max-width: 800px; margin: 0 auto; padding: 36px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1e3a4f; padding-bottom: 16px; margin-bottom: 20px; }
+    .company-name { font-size: 20px; font-weight: 800; color: #1e3a4f; }
+    .company-sub { font-size: 11px; color: #666; margin-top: 4px; }
+    .invoice-label { text-align: right; }
+    .invoice-label h2 { font-size: 22px; font-weight: 800; color: #1e3a4f; letter-spacing: 2px; }
+    .invoice-label p { font-size: 11px; color: #555; margin-top: 4px; }
+    .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .meta-box { background: #f8f9fa; border: 1px solid #e5e7eb; padding: 12px 16px; border-radius: 4px; }
+    .meta-box label { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+    .meta-box p { font-size: 13px; font-weight: 600; color: #111; margin-top: 4px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    thead tr { background: #1e3a4f; color: #fff; }
+    thead th { padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    thead th:not(:first-child) { text-align: right; }
+    tbody tr:nth-child(even) { background: #f9fafb; }
+    .totals { display: flex; justify-content: flex-end; margin-top: 8px; }
+    .totals-box { width: 260px; }
+    .totals-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 12px; border-bottom: 1px solid #f0f0f0; }
+    .totals-row.grand { background: #1e3a4f; color: #ffb347; padding: 8px 10px; font-size: 14px; font-weight: 800; border-radius: 4px; margin-top: 6px; border-bottom: none; }
+    .notes { margin-top: 24px; padding: 12px 16px; background: #f8f9fa; border-left: 3px solid #1e3a4f; border-radius: 2px; }
+    .notes label { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; }
+    .notes p { font-size: 12px; color: #333; margin-top: 4px; }
+    .footer { margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 16px; display: flex; justify-content: space-between; font-size: 10px; color: #aaa; }
+    @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div>
+      <div class="company-name">${companyName}</div>
+      <div class="company-sub">Registered under GST | SmartERP v1.0</div>
+    </div>
+    <div class="invoice-label">
+      <h2>SALES INVOICE</h2>
+      <p>Voucher No: <strong>${v.voucherNumber}</strong></p>
+    </div>
+  </div>
+
+  <div class="meta">
+    <div class="meta-box">
+      <label>Bill To</label>
+      <p>${v.ledgerName || "—"}</p>
+    </div>
+    <div class="meta-box">
+      <label>Invoice Date</label>
+      <p>${v.voucherDate || "—"}</p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Item Description</th>
+        <th style="text-align:right">Qty</th>
+        <th style="text-align:right">Rate</th>
+        <th style="text-align:right">Amount</th>
+        <th style="text-align:right">GST</th>
+        <th style="text-align:right">Total</th>
+      </tr>
+    </thead>
+    <tbody>${lineRows}</tbody>
+  </table>
+
+  <div class="totals">
+    <div class="totals-box">
+      <div class="totals-row"><span>Subtotal</span><span>${new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",minimumFractionDigits:2}).format(subtotal)}</span></div>
+      <div class="totals-row"><span>GST</span><span>${new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",minimumFractionDigits:2}).format(totalGst)}</span></div>
+      <div class="totals-row grand"><span>Grand Total</span><span>${new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",minimumFractionDigits:2}).format(v.totalAmount)}</span></div>
+    </div>
+  </div>
+
+  ${v.notes ? `<div class="notes"><label>Notes / Narration</label><p>${v.notes}</p></div>` : ""}
+
+  <div class="footer">
+    <span>Generated by SmartERP — ${new Date().toLocaleDateString("en-IN")}</span>
+    <span>This is a computer-generated invoice.</span>
+  </div>
+</div>
+<script>window.onload = function() { window.print(); window.onafterprint = function(){ window.close(); }; }<\/script>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank", "width=900,height=700");
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+    }
+  };
+
   const totals = calculateTotals();
 
   // ==========================================
@@ -396,9 +516,7 @@ export default function SalesVoucherPage() {
                               View
                             </button>
                             <button
-                              onClick={() => {
-                                toast.success(`Printing Voucher ${v.voucherNumber}...`);
-                              }}
+                              onClick={() => printVoucher(v)}
                               className="hover:text-green-600 transition-colors cursor-pointer ml-3.5 bg-transparent border-none"
                             >
                               Print
