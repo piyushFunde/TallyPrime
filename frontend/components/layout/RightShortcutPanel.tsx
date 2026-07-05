@@ -5,6 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { X, ChevronLeft, HelpCircle, Calculator, Search, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { companyApi } from "@/lib/api";
+import type { Company } from "@/lib/types";
 
 interface ShortcutItem {
   key: string;
@@ -34,6 +36,20 @@ export default function RightShortcutPanel() {
 
   const { logout } = useAuth();
 
+  // Company management state
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(false);
+  const [showCreateCompany, setShowCreateCompany] = useState(false);
+  const [activeCompanyObj, setActiveCompanyObj] = useState<Company | null>(null);
+
+  // Create Company Form state
+  const [newCompanyName, setNewCompanyName] = useState("");
+  const [newCompanyGst, setNewCompanyGst] = useState("");
+  const [newCompanyAddress, setNewCompanyAddress] = useState("");
+  const [newCompanyState, setNewCompanyState] = useState("");
+  const [newCompanyContact, setNewCompanyContact] = useState("");
+  const [newCompanyFyStart, setNewCompanyFyStart] = useState("2026-04-01");
+
   // Local Storage States (with fallbacks)
   const [currentCompany, setCurrentCompany] = useState("SmartERP India Pvt Ltd");
   const [periodFrom, setPeriodFrom] = useState("2026-04-01");
@@ -44,11 +60,53 @@ export default function RightShortcutPanel() {
   const [autoGst, setAutoGst] = useState(true);
   const [showSql, setShowSql] = useState(false);
 
+  const fetchCompanies = async () => {
+    setLoadingCompanies(true);
+    try {
+      const data = await companyApi.getAll();
+      setCompanies(data);
+      
+      // If we have an active company in local storage, sync it with the latest database values
+      const savedCompany = localStorage.getItem("tally_company");
+      if (savedCompany && data.length > 0) {
+        const active = data.find(c => c.name.toLowerCase() === savedCompany.toLowerCase());
+        if (active) {
+          setActiveCompanyObj(active);
+          localStorage.setItem("tally_company_obj", JSON.stringify(active));
+        }
+      } else if (data.length > 0 && !savedCompany) {
+        // Fallback default active company
+        const first = data[0];
+        setCurrentCompany(first.name);
+        setActiveCompanyObj(first);
+        localStorage.setItem("tally_company", first.name);
+        localStorage.setItem("tally_company_obj", JSON.stringify(first));
+        localStorage.setItem("tally_period_from", first.financialYearStart);
+        localStorage.setItem("tally_period_to", first.financialYearEnd);
+        setPeriodFrom(first.financialYearStart);
+        setPeriodTo(first.financialYearEnd);
+      }
+    } catch (e) {
+      console.error("Failed to load companies from backend", e);
+    } finally {
+      setLoadingCompanies(false);
+    }
+  };
+
   // Load from local storage
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedCompany = localStorage.getItem("tally_company");
       if (savedCompany) setCurrentCompany(savedCompany);
+
+      const savedCompanyObj = localStorage.getItem("tally_company_obj");
+      if (savedCompanyObj) {
+        try {
+          setActiveCompanyObj(JSON.parse(savedCompanyObj));
+        } catch (e) {
+          // ignore parsing error
+        }
+      }
 
       const savedFrom = localStorage.getItem("tally_period_from");
       const savedTo = localStorage.getItem("tally_period_to");
@@ -63,16 +121,74 @@ export default function RightShortcutPanel() {
 
       const savedShowSql = localStorage.getItem("tally_showsql");
       if (savedShowSql !== null) setShowSql(savedShowSql === "true");
+
+      // Load companies list from backend
+      fetchCompanies();
     }
   }, []);
 
   // Save Helpers
+  const selectCompany = (company: Company) => {
+    setCurrentCompany(company.name);
+    setActiveCompanyObj(company);
+    localStorage.setItem("tally_company", company.name);
+    localStorage.setItem("tally_company_obj", JSON.stringify(company));
+    
+    // Update accounting period to match company's financial year
+    localStorage.setItem("tally_period_from", company.financialYearStart);
+    localStorage.setItem("tally_period_to", company.financialYearEnd);
+    setPeriodFrom(company.financialYearStart);
+    setPeriodTo(company.financialYearEnd);
+    
+    toast.success(`Active Company changed to: ${company.name}`);
+    window.dispatchEvent(new CustomEvent("tallyCompanyChanged", { detail: company.name }));
+    window.dispatchEvent(new CustomEvent("tallyPeriodChanged", { detail: { from: company.financialYearStart, to: company.financialYearEnd } }));
+    setShowCompany(false);
+  };
+
   const saveCompany = (company: string) => {
     setCurrentCompany(company);
     localStorage.setItem("tally_company", company);
     toast.success(`Active Company changed to: ${company}`);
     window.dispatchEvent(new CustomEvent("tallyCompanyChanged", { detail: company }));
     setShowCompany(false);
+  };
+
+  const handleCreateCompany = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCompanyName.trim()) {
+      toast.error("Company Name is required");
+      return;
+    }
+    
+    try {
+      const payload = {
+        name: newCompanyName.trim(),
+        gstNumber: newCompanyGst.trim() || undefined,
+        financialYearStart: newCompanyFyStart,
+        address: newCompanyAddress.trim() || undefined,
+        state: newCompanyState.trim() || undefined,
+        contact: newCompanyContact.trim() || undefined,
+      };
+      
+      const created = await companyApi.create(payload);
+      toast.success(`Company "${created.name}" created successfully!`);
+      
+      // Clear inputs
+      setNewCompanyName("");
+      setNewCompanyGst("");
+      setNewCompanyAddress("");
+      setNewCompanyState("");
+      setNewCompanyContact("");
+      setNewCompanyFyStart("2026-04-01");
+      
+      setShowCreateCompany(false);
+      await fetchCompanies();
+      selectCompany(created);
+    } catch (err: any) {
+      const msg = err.response?.data?.message || "Failed to create company";
+      toast.error(msg);
+    }
   };
 
   const savePeriod = (e: React.FormEvent) => {
@@ -831,32 +947,46 @@ export default function RightShortcutPanel() {
             </div>
             <div className="p-2 text-xs text-[#1e3a4f]">
               <div className="mb-2 px-2 text-[10px] font-bold text-gray-500 uppercase">List of Companies</div>
-              <div className="flex flex-col gap-0.5 max-h-48 overflow-y-auto">
-                {[
-                  "SmartERP India Pvt Ltd",
-                  "Acme Accounting Services",
-                  "Global Traders & Co.",
-                  "Pioneer Retailers LLC"
-                ].map((company) => {
-                  const isSelected = company === currentCompany;
-                  return (
-                    <button
-                      key={company}
-                      type="button"
-                      onClick={() => saveCompany(company)}
-                      className={`w-full text-left py-2 px-3 border border-transparent transition-colors ${
-                        isSelected 
-                          ? "bg-[#1e3a4f] text-[#ffb347] font-bold" 
-                          : "hover:bg-[#1e3a4f]/10 text-[#1e3a4f]"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{company}</span>
-                        {isSelected && <span className="text-[10px] uppercase font-bold text-tally-accent">Active</span>}
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="flex flex-col gap-0.5 max-h-56 overflow-y-auto tally-scrollbar">
+                {/* Create Company option inside list */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCompany(false);
+                    setShowCreateCompany(true);
+                  }}
+                  className="w-full text-left py-2 px-3 border border-dashed border-[#1e3a4f]/30 hover:bg-[#1e3a4f]/5 text-[#1e3a4f] font-bold flex items-center justify-between mb-1"
+                >
+                  <span>+ Create Company</span>
+                  <span className="text-[9px] bg-[#1e3a4f]/10 px-1 py-0.5 rounded font-mono">NEW</span>
+                </button>
+
+                {loadingCompanies ? (
+                  <div className="text-center py-4 text-gray-500">Loading companies...</div>
+                ) : companies.length === 0 ? (
+                  <div className="text-center py-4 text-gray-500">No companies found</div>
+                ) : (
+                  companies.map((company) => {
+                    const isSelected = company.name.toLowerCase() === currentCompany.toLowerCase();
+                    return (
+                      <button
+                        key={company.id}
+                        type="button"
+                        onClick={() => selectCompany(company)}
+                        className={`w-full text-left py-2 px-3 border border-transparent transition-colors ${
+                          isSelected 
+                            ? "bg-[#1e3a4f] text-[#ffb347] font-bold" 
+                            : "hover:bg-[#1e3a4f]/10 text-[#1e3a4f]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>{company.name}</span>
+                          {isSelected && <span className="text-[10px] uppercase font-bold text-tally-accent">Active</span>}
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
               </div>
             </div>
             <div className="bg-[#1e3a4f]/5 px-4 py-3 flex justify-end border-t border-[#1e3a4f]/10">
@@ -869,6 +999,100 @@ export default function RightShortcutPanel() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* CREATE NEW COMPANY DIALOG */}
+      {showCreateCompany && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <form onSubmit={handleCreateCompany} className="w-full max-w-md bg-[#f5f0e8] border-2 border-[#1e3a4f] shadow-2xl rounded-sm overflow-hidden tally-fade-in font-mono text-[#1e3a4f]">
+            <div className="bg-[#1e3a4f] text-[#ffb347] px-4 py-2 flex items-center justify-between text-xs font-bold border-b border-[#2a5470]">
+              <span>Create Company</span>
+              <button type="button" onClick={() => setShowCreateCompany(false)} className="text-white hover:text-[#ffb347]">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="p-4 text-xs space-y-3 max-h-[70vh] overflow-y-auto tally-scrollbar">
+              <div>
+                <label className="block font-bold mb-1">Company Name <span className="text-red-500">*</span></label>
+                <input 
+                  type="text"
+                  required
+                  value={newCompanyName}
+                  onChange={(e) => setNewCompanyName(e.target.value)}
+                  className="w-full bg-white border border-[#1e3a4f]/30 p-2 focus:outline-none text-xs font-bold text-tally-dark focus:border-tally-accent"
+                  placeholder="e.g. Acme Corporation"
+                />
+              </div>
+              <div>
+                <label className="block font-bold mb-1">GST Number (15-character)</label>
+                <input 
+                  type="text"
+                  maxLength={15}
+                  value={newCompanyGst}
+                  onChange={(e) => setNewCompanyGst(e.target.value.toUpperCase())}
+                  className="w-full bg-white border border-[#1e3a4f]/30 p-2 focus:outline-none text-xs font-bold text-tally-dark focus:border-tally-accent"
+                  placeholder="e.g. 27AAAAA1111A1Z1"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold mb-1">State</label>
+                  <input 
+                    type="text"
+                    value={newCompanyState}
+                    onChange={(e) => setNewCompanyState(e.target.value)}
+                    className="w-full bg-white border border-[#1e3a4f]/30 p-2 focus:outline-none text-xs font-bold text-tally-dark focus:border-tally-accent"
+                    placeholder="e.g. Maharashtra"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold mb-1">Financial Year Start</label>
+                  <input 
+                    type="date"
+                    value={newCompanyFyStart}
+                    onChange={(e) => setNewCompanyFyStart(e.target.value)}
+                    className="w-full bg-white border border-[#1e3a4f]/30 p-2 focus:outline-none text-xs font-bold text-tally-dark focus:border-tally-accent"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block font-bold mb-1">Mailing Address</label>
+                <textarea 
+                  rows={2}
+                  value={newCompanyAddress}
+                  onChange={(e) => setNewCompanyAddress(e.target.value)}
+                  className="w-full bg-white border border-[#1e3a4f]/30 p-2 focus:outline-none text-xs font-bold text-tally-dark focus:border-tally-accent resize-none"
+                  placeholder="Enter company address..."
+                />
+              </div>
+              <div>
+                <label className="block font-bold mb-1">Contact Details (Phone / Email)</label>
+                <input 
+                  type="text"
+                  value={newCompanyContact}
+                  onChange={(e) => setNewCompanyContact(e.target.value)}
+                  className="w-full bg-white border border-[#1e3a4f]/30 p-2 focus:outline-none text-xs font-bold text-tally-dark focus:border-tally-accent"
+                  placeholder="e.g. +91 9876543210, info@acme.com"
+                />
+              </div>
+            </div>
+            <div className="bg-[#1e3a4f]/5 px-4 py-3 flex justify-end gap-2 border-t border-[#1e3a4f]/10">
+              <button 
+                type="button"
+                onClick={() => setShowCreateCompany(false)}
+                className="bg-white/60 hover:bg-white text-[#1e3a4f] px-3 py-1.5 text-xs border border-[#1e3a4f]/30 font-bold"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                className="bg-[#1e3a4f] text-[#ffb347] hover:bg-[#1a2e3f] px-4 py-1.5 text-xs font-bold rounded-sm border border-[#ffb347]/30 cursor-pointer"
+              >
+                Create Company
+              </button>
+            </div>
+          </form>
         </div>
       )}
 
@@ -950,16 +1174,25 @@ export default function RightShortcutPanel() {
             </div>
             <div className="p-4 text-xs space-y-3">
               <div className="pb-2 border-b border-[#1e3a4f]/20 text-center">
-                <h3 className="font-bold text-sm">{currentCompany}</h3>
+                <h3 className="font-bold text-sm">{activeCompanyObj?.name || currentCompany}</h3>
                 <span className="text-[10px] text-gray-500">Corporate Master Registry</span>
               </div>
               
-              <div className="space-y-1 bg-white/40 border border-[#1e3a4f]/10 p-2 rounded-sm">
-                <div><span className="font-bold">Mailing Name:</span> {currentCompany}</div>
-                <div><span className="font-bold">Financial Year:</span> 01-Apr-2026 to 31-Mar-2027</div>
-                <div><span className="font-bold">Tax Compliance:</span> GST Compliant (Active IGST/CGST)</div>
-                <div><span className="font-bold">State/Country:</span> Maharashtra, India</div>
-                <div><span className="font-bold">Database Server:</span> Spring Boot JPA Integration</div>
+              <div className="space-y-1 bg-white/40 border border-[#1e3a4f]/10 p-2 rounded-sm max-h-[50vh] overflow-y-auto tally-scrollbar">
+                <div><span className="font-bold">Mailing Name:</span> {activeCompanyObj?.name || currentCompany}</div>
+                <div>
+                  <span className="font-bold">Financial Year:</span>{" "}
+                  {activeCompanyObj
+                    ? `${formatDate(activeCompanyObj.financialYearStart)} to ${formatDate(activeCompanyObj.financialYearEnd)}`
+                    : `${formatDate(periodFrom)} to ${formatDate(periodTo)}`}
+                </div>
+                <div><span className="font-bold">GST Number:</span> {activeCompanyObj?.gstNumber || "Not Registered"}</div>
+                <div><span className="font-bold">State:</span> {activeCompanyObj?.state || "Not Configured"}</div>
+                <div><span className="font-bold">Contact:</span> {activeCompanyObj?.contact || "Not Configured"}</div>
+                {activeCompanyObj?.address && (
+                  <div className="whitespace-pre-wrap"><span className="font-bold">Address:</span> {activeCompanyObj.address}</div>
+                )}
+                <div><span className="font-bold">Database Server:</span> JPA / Hibernate Active</div>
               </div>
             </div>
             <div className="bg-[#1e3a4f]/5 px-4 py-3 flex justify-end border-t border-[#1e3a4f]/10">

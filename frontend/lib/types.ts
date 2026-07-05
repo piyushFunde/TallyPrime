@@ -113,3 +113,26 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface Company {
+  id: number;
+  name: string;
+  gstNumber?: string;
+  financialYearStart: string;
+  financialYearEnd: string;
+  address?: string;
+  state?: string;
+  contact?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CompanyFormData {
+  name: string;
+  gstNumber?: string;
+  financialYearStart: string;
+  financialYearEnd?: string;
+  address?: string;
+  state?: string;
+  contact?: string;
+}
+

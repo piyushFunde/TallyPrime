@@ -10,6 +10,8 @@ import type {
   VoucherType,
   User,
   AuthResponse,
+  Company,
+  CompanyFormData,
 } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
@@ -139,6 +141,36 @@ export const authApi = {
   register: async (name: string, email: string, password: string): Promise<User> => {
     const res = await api.post<User>("/auth/register", { name, email, password });
     return res.data;
+  },
+};
+
+// ================================
+// Company API
+// ================================
+
+export const companyApi = {
+  getAll: async (): Promise<Company[]> => {
+    const res = await api.get("/companies");
+    return res.data;
+  },
+
+  getById: async (id: number): Promise<Company> => {
+    const res = await api.get(`/companies/${id}`);
+    return res.data;
+  },
+
+  create: async (data: CompanyFormData): Promise<Company> => {
+    const res = await api.post("/companies", data);
+    return res.data;
+  },
+
+  update: async (id: number, data: CompanyFormData): Promise<Company> => {
+    const res = await api.put(`/companies/${id}`, data);
+    return res.data;
+  },
+
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/companies/${id}`);
   },
 };
 
