@@ -5,6 +5,10 @@ SmartERP is a modern, web-based Enterprise Resource Planning (ERP) platform desi
 ---
 🌐 **Website:** [[[SmartERP]]](https://frontend-production-f061.up.railway.app)
 
+---
+## Architecture diagram
+<img width="3348" height="7995" alt="diagram (3)" src="https://github.com/user-attachments/assets/08b7c5a5-a92b-4ff2-945e-e542a5e8bb06" />
+
 
 ##  Technology Stack
 
